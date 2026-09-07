@@ -1,0 +1,24 @@
+# Local clones (Kiwi forks, Afterbird, Relixor). See scripts/clone-upstream.sh
+vendor/
+
+# Chromium checkout (tens of GB)
+chromium/
+depot_tools/
+.src-chromium/
+
+# Build output
+out/
+*.apk
+*.aab
+keystore.jks
+*.keystore
+
+# Editors / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+.env
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2026 Facilitat-dev
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+-->
+
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The application name displayed to the user. -->
+    <string name="app_name" translatable="false">Facilitat Browser</string>
+    <string name="bookmark_widget_title" translatable="false">Facilitat Browser bookmarks</string>
+    <string name="search_widget_title" translatable="false">Facilitat Browser search</string>
+    <string name="quick_action_search_widget_title" translatable="false">Facilitat Browser quick action search</string>
+</resources>

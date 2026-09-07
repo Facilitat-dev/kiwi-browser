@@ -1,0 +1,16 @@
+This project is an independent Chromium-based Android browser.
+
+It is not affiliated with, endorsed by, or maintained by Geometry OU,
+Kiwi Browser, or the original kiwibrowser GitHub account.
+
+Source lineage:
+- Chromium (BSD-style), https://chromium.googlesource.com/chromium/src
+- Kiwi Browser overlay and patches (BSD-3-Clause / GPL-3.0 depending on repo)
+
+GPL-3.0 material lives only under patches/legacy-kiwi/ (copied from
+kiwibrowser/patches and kiwibrowser/chromium_extension_patches). Those files
+remain GPL-3.0. Do not mix them into BSD-only trees without reviewing the
+license implications.
+
+Do not use the Kiwi Browser name, logo, or package ID (com.kiwibrowser.browser)
+on public builds.

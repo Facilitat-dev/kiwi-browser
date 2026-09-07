@@ -1,0 +1,30 @@
+# Working product identity. Change these before the first public APK.
+
+[product]
+name = "Facilitat Browser"
+short_name = "Browser"
+application_id = "dev.facilitat.browser"
+# Do not ship as com.kiwibrowser.browser — that ID belongs to the archived Kiwi app.
+
+[owner]
+github = "Facilitat-dev"
+copyright = "Facilitat-dev"
+
+[engine]
+# Afterbird's verified baseline. This is the build pin.
+chromium = "151.0.7922.38"
+# Relixor/Kiwi overlay last engine (reference only, not the build).
+kiwi_last_release = "137.0.7337.0"
+# Chromium stable as of 2026-09, next rebase target.
+target_chromium = "152.0.7977.82"
+
+[references]
+# Engineering: tiny Chromium 151 delta, real APKs, MV2 on desktop-android.
+afterbird = "https://github.com/danosito/afterbird"
+# Product direction the owner liked (purple / extensions-first). Not our name.
+relixor = "https://github.com/Relixor/Relixor"
+accent = "#8000FF"
+
+[network]
+# No kiwibrowser.com, find.kiwi, or Geometry OU endpoints.
+allow_kiwi_servers = false
