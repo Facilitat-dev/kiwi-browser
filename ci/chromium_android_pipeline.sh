@@ -9,11 +9,11 @@ ARGS_VARIANT="${ARGS_VARIANT:-${AFTERBIRD_ARGS_VARIANT:-release}}"
 REFERENCE_ARGS_FILE=""  # derived from ARGS_VARIANT in main()
 PATCHES_DIR=""          # derived from CHROMIUM_MAJOR in main()
 
-# Paths (tracked in this repo) rsynced verbatim onto the Chromium checkout.
-# Everything else is applied as patches/m<major>/*.patch.
-OVERLAY_PATHS=(
-  "chrome/android/java/res_chromium_base"
-)
+# Branding files live in branding/android/res_chromium_base and are merged
+# into Chromium's chrome/android/java/res_chromium_base (do not replace that
+# directory with a symlink — rsync will fail on a populated tree).
+BRANDING_SRC="${REPO_ROOT}/branding/android/res_chromium_base"
+BRANDING_DEST_REL="chrome/android/java/res_chromium_base"
 
 WORKDIR="${CHROMIUM_WORKDIR:-${AFTERBIRD_CHROMIUM_WORKDIR:-${REPO_ROOT}/chromium}}"
 OUT_DIR="${CHROMIUM_OUT_DIR:-${AFTERBIRD_OUT_DIR:-out/android_arm64}}"
@@ -315,19 +315,11 @@ clean_source_tree() {
 }
 
 apply_overlay() {
-  local manifest
-  manifest="$(mktemp)"
-
-  git -C "${REPO_ROOT}" ls-files -z -- "${OVERLAY_PATHS[@]}" > "${manifest}"
-
-  if [[ ! -s "${manifest}" ]]; then
-    rm -f "${manifest}"
-    die "Overlay manifest is empty"
-  fi
-
-  log "Applying branding overlay onto Chromium tree (include-list: ${OVERLAY_PATHS[*]})"
-  rsync -a --from0 --files-from="${manifest}" "${REPO_ROOT}/" "${WORKDIR}/src/"
-  rm -f "${manifest}"
+  local dest="${WORKDIR}/src/${BRANDING_DEST_REL}"
+  [[ -d "${BRANDING_SRC}" ]] || die "Missing branding overlay: ${BRANDING_SRC}"
+  mkdir -p "${dest}"
+  log "Merging branding overlay ${BRANDING_SRC} -> ${dest}"
+  rsync -a "${BRANDING_SRC}/" "${dest}/"
 }
 
 apply_patches() {
