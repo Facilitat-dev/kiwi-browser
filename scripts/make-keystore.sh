@@ -22,7 +22,7 @@ keytool -genkeypair -v \
   -alias "${ALIAS}" \
   -keyalg RSA -keysize 2048 -validity 10000 \
   -storepass "${PASS}" -keypass "${PASS}" \
-  -dname "CN=Facilitat Browser (dev), OU=Facilitat-dev, O=Facilitat-dev, C=US"
+  -dname "CN=Canopy (dev), OU=Facilitat-dev, O=Facilitat-dev, C=US"
 
 cat > "${ENVF}" <<EOF
 ANDROID_KEYSTORE_PATH=${STORE}

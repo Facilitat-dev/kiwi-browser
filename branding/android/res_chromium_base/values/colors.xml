@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-Copyright 2026 Facilitat-dev
-Relixor-direction accent. App name and launcher icons are owned separately
-and land in this overlay when ready.
--->
+<!-- Folio Calm Sage. Source: branding/canopy-branding/tokens/tokens.json -->
 <resources>
-    <color name="brand_accent">#FF8000FF</color>
-    <color name="brand_accent_dark">#FF4A0099</color>
-    <color name="brand_accent_light">#FFB266FF</color>
+    <color name="brand_paper">#FFF7F9F7</color>
+    <color name="brand_pine">#FF181C1A</color>
+    <color name="brand_cream_text">#FFE0E3DF</color>
+    <color name="brand_primary">#FF496556</color>
+    <color name="brand_sage_seed">#FF6B8E7D</color>
+    <color name="brand_sage_light">#FF98B4A4</color>
+    <color name="brand_container">#FF2F483D</color>
+    <color name="brand_clay">#FFD4B197</color>
+    <color name="brand_slate">#FFA6B7C6</color>
+    <color name="brand_outline">#FF3F4843</color>
+    <color name="brand_accent">#FF496556</color>
+    <color name="brand_accent_dark">#FF2F483D</color>
+    <color name="brand_accent_light">#FF98B4A4</color>
 </resources>

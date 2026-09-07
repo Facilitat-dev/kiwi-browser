@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 160" width="640" height="160" role="img" aria-label="Canopy">
+  <title>Canopy wordmark</title>
+  <rect width="640" height="160" fill="none"/>
+  <text x="40" y="102" font-family="Exo 2, Sora, Outfit, sans-serif" font-size="72" font-weight="600" letter-spacing="10" fill="#181C1A">CAN</text>
+  <circle cx="338" cy="78" r="28" fill="none" stroke="#181C1A" stroke-width="7"/>
+  <path d="M338 58c8 8 12 14 12 22 0 8-5 14-12 20-7-6-12-12-12-20 0-8 4-14 12-22z" fill="#6B8E7D"/>
+  <path d="M338 64v30" stroke="#2F483D" stroke-width="2" fill="none"/>
+  <text x="374" y="102" font-family="Exo 2, Sora, Outfit, sans-serif" font-size="72" font-weight="600" letter-spacing="10" fill="#181C1A">PY</text>
+</svg>

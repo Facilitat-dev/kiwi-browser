@@ -1,0 +1,16 @@
+:root {
+  --canopy-sage-seed: #6B8E7D;
+  --canopy-primary: #496556;
+  --canopy-sage-light: #98B4A4;
+  --canopy-container: #2F483D;
+  --canopy-clay: #D4B197;
+  --canopy-slate: #A6B7C6;
+  --canopy-paper: #F7F9F7;
+  --canopy-pine: #181C1A;
+  --canopy-cream: #E0E3DF;
+  --canopy-outline: #3F4843;
+
+  --canopy-font-display: "Exo 2", "Sora", "Outfit", system-ui, sans-serif;
+  --canopy-font-ui: "Figtree", "Source Sans 3", "Inter", system-ui, sans-serif;
+  --canopy-font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
+}

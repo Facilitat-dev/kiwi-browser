@@ -15,7 +15,7 @@ dcheck_always_on = false
 treat_warnings_as_errors = false
 disable_android_lint = true
 
-chrome_public_manifest_package = "dev.facilitat.browser"
+chrome_public_manifest_package = "app.canopy.browser"
 
 # No Google keys, no telemetry, no manufacturer integration.
 use_official_google_api_keys = false

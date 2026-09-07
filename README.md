@@ -1,17 +1,20 @@
-# Facilitat Browser
+# Canopy
 
-Independent Chromium Android browser with Chrome extensions. Kiwi lineage, our implementation.
+A quiet, privacy-centric Chromium browser for Android (Linux later). Kiwi lineage, Afterbird extension stack, our implementation.
 
-Not affiliated with Geometry OU, [Afterbird](https://github.com/danosito/afterbird), or [Relixor](https://github.com/Relixor/Relixor).
+Not affiliated with Geometry OU, Afterbird, or Relixor.
 
-## Working identity
+Browse under cover.
+
+## Identity
 
 | | |
 |---|---|
-| Display name | Facilitat Browser (working title — rename before a public APK) |
-| Application ID | `dev.facilitat.browser` |
+| Name | **Canopy** |
+| Application ID | `app.canopy.browser` |
+| Palette | Folio Calm Sage (`branding/canopy-branding/`) |
 | Engine | Chromium **153.0.8010.39** |
-| Privacy | No Google keys, no field trials, no reporting (see [docs/PRIVACY.md](docs/PRIVACY.md)) |
+| Privacy | No Google keys, field trials, or reporting — [docs/PRIVACY.md](docs/PRIVACY.md) |
 | Owner | [Facilitat-dev](https://github.com/Facilitat-dev) |
 
 This repo is indexed by graft (`graft/`). Ask the graph before grepping.
@@ -20,7 +23,7 @@ This repo is indexed by graft (`graft/`). Ask the graph before grepping.
 
 **Engineering base — [Afterbird](https://github.com/danosito/afterbird).** Most active Kiwi successor. Tiny delta over stock Chromium 151 with `is_desktop_android=true`, five patches, real APKs, Chrome Web Store install, uBlock Origin 132/132. GitHub will not let us fork it (already forked `src.next` in the same network), so it lives under `vendor/afterbird` and its patch series is copied into `patches/m151/`.
 
-**Product direction — [Relixor](https://github.com/Relixor/Relixor).** The fork we want to feel like: extensions-first, clean/minimal, purple `#8000FF`. Relixor itself is still a frozen `src.next` overlay (Oct 2025, no APKs). We are not shipping their name or icons.
+**Brand — Canopy / Folio Calm Sage.** Kit in `branding/canopy-branding/`. Launcher mipmaps are rasterized from `logos/canopy-app-icon.svg`.
 
 **Lineage — Kiwi.** Original org forked under Facilitat-dev as `kiwi-*`. Overlay identity cuts (no `*.kiwibrowser.com`, package ID change) live on [kiwi-src-next](https://github.com/Facilitat-dev/kiwi-src-next).
 

@@ -1,29 +1,31 @@
-# Working product identity. Change these before the first public APK.
+# Canopy — see branding/canopy-branding/AGENT_BRAND.md
 
 [product]
-name = "Facilitat Browser"
-short_name = "Browser"
-application_id = "dev.facilitat.browser"
-# Do not ship as com.kiwibrowser.browser — that ID belongs to the archived Kiwi app.
+name = "Canopy"
+short_name = "Canopy"
+application_id = "app.canopy.browser"
+tagline = "Browse under cover."
 
 [owner]
 github = "Facilitat-dev"
 copyright = "Facilitat-dev"
 
 [engine]
-# Live pin (Chrome 153 stable line, 2026-09).
 chromium = "153.0.8010.39"
-# Afterbird last verified APK engine.
 afterbird_verified = "151.0.7922.38"
 kiwi_last_release = "137.0.7337.0"
 
-[references]
-# Engineering: tiny Chromium 151 delta, real APKs, MV2 on desktop-android.
-afterbird = "https://github.com/danosito/afterbird"
-# Product direction the owner liked (purple / extensions-first). Not our name.
-relixor = "https://github.com/Relixor/Relixor"
-accent = "#8000FF"
+[color]
+paper = "#F7F9F7"
+pine = "#181C1A"
+cream_text = "#E0E3DF"
+primary = "#496556"
+sage_seed = "#6B8E7D"
+sage_light = "#98B4A4"
+container = "#2F483D"
+clay = "#D4B197"
+slate = "#A6B7C6"
+outline = "#3F4843"
 
 [network]
-# No kiwibrowser.com, find.kiwi, or Geometry OU endpoints.
 allow_kiwi_servers = false

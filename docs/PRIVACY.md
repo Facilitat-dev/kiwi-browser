@@ -22,6 +22,6 @@ Cromite/ungoogled do more in-tree: domain substitution, disable Safe Browsing ne
 
 ## Product
 
-- Package ID `dev.facilitat.browser` (not Kiwi, Afterbird, or Chrome)
+- Package ID `app.canopy.browser` (not Kiwi, Afterbird, or Chrome)
 - No `*.kiwibrowser.com` / `find.kiwi`
 - Chrome Web Store UA override is for installing extensions, not telemetry

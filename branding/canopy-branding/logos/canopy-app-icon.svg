@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Canopy app icon">
+  <title>Canopy app icon</title>
+  <rect width="256" height="256" rx="56" fill="#181C1A"/>
+  <g transform="translate(128 138)">
+    <path d="M0 62c-38 0-68-22-68-52V-2c22-12 46-18 68-18s46 6 68 18v12c0 30-30 52-68 52z" fill="#2F483D"/>
+    <path d="M0 50c-28 0-50-16-50-38v-8c16-8 34-12 50-12s34 4 50 12v8c0 22-22 38-50 38z" fill="#496556"/>
+  </g>
+  <g fill="#6B8E7D">
+    <path d="M128 36l16 36-16 10-16-10z"/>
+    <path d="M78 58l32 24-20 12-22-18z"/>
+    <path d="M178 58l-32 24 20 12 22-18z"/>
+    <path d="M52 102l36 10-8 18-30-6z"/>
+    <path d="M204 102l-36 10 8 18 30-6z"/>
+  </g>
+  <g fill="#98B4A4">
+    <path d="M128 44l10 24-10 6-10-6z"/>
+    <path d="M88 66l22 16-12 8-16-12z"/>
+    <path d="M168 66l-22 16 12 8 16-12z"/>
+  </g>
+  <circle cx="128" cy="40" r="5" fill="#E0E3DF"/>
+  <circle cx="74" cy="60" r="4" fill="#E0E3DF"/>
+  <circle cx="182" cy="60" r="4" fill="#E0E3DF"/>
+  <circle cx="50" cy="104" r="3.5" fill="#E0E3DF"/>
+  <circle cx="206" cy="104" r="3.5" fill="#E0E3DF"/>
+</svg>

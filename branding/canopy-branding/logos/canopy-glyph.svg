@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Canopy glyph">
+  <title>Canopy glyph</title>
+  <rect width="128" height="128" rx="28" fill="#181C1A"/>
+  <path d="M64 86c-16 0-28-8-28-22v-8c8-4 18-6 28-6s20 2 28 6v8c0 14-12 22-28 22z" fill="#496556"/>
+  <path d="M64 34c7 8 11 14 11 22S71 70 64 78C57 70 53 64 53 56s4-14 11-22z" fill="#98B4A4"/>
+  <path d="M40 46c10 4 18 12 22 22-12-2-24-8-30-18 2-2 5-4 8-4z" fill="#6B8E7D"/>
+  <path d="M88 46c-10 4-18 12-22 22 12-2 24-8 30-18-2-2-5-4-8-4z" fill="#6B8E7D"/>
+</svg>

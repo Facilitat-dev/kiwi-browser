@@ -7,8 +7,9 @@ found in the LICENSE file.
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- The application name displayed to the user. -->
-    <string name="app_name" translatable="false">Facilitat Browser</string>
-    <string name="bookmark_widget_title" translatable="false">Facilitat Browser bookmarks</string>
-    <string name="search_widget_title" translatable="false">Facilitat Browser search</string>
-    <string name="quick_action_search_widget_title" translatable="false">Facilitat Browser quick action search</string>
+    <string name="app_name" translatable="false">Canopy</string>
+    <string name="bookmark_widget_title" translatable="false">Canopy bookmarks</string>
+    <string name="search_widget_title" translatable="false">Canopy search</string>
+    <string name="quick_action_search_widget_title" translatable="false">Canopy quick action search</string>
+    <string name="dino_widget_title" translatable="false">Canopy dino</string>
 </resources>

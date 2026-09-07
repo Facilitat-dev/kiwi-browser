@@ -14,7 +14,7 @@ This repo is a **delta**, not a Chromium checkout. Compilation happens in `chrom
 ./ci/chromium_android_pipeline.sh --full-build
 ```
 
-The pipeline rsyncs `chrome/android/java/res_chromium_base` and applies `patches/m153/*.patch`. GN args: `.build/args/test.gn` or `.build/args/release.gn`. Both set `is_desktop_android = true`, `chrome_public_manifest_package = "dev.facilitat.browser"`, and the privacy flags in [PRIVACY.md](PRIVACY.md).
+The pipeline rsyncs `chrome/android/java/res_chromium_base` and applies `patches/m153/*.patch`. GN args: `.build/args/test.gn` or `.build/args/release.gn`. Both set `is_desktop_android = true`, `chrome_public_manifest_package = "app.canopy.browser"`, and the privacy flags in [PRIVACY.md](PRIVACY.md).
 
 Default workspace: `chromium/` in this repo. Override with `CHROMIUM_WORKDIR`.
 
@@ -34,4 +34,4 @@ uBlock zip: `./ci/fetch_ublock_chromium.sh` (pinned 1.62.0, gitignored under `th
 
 ## Package ID
 
-Public APKs must use `dev.facilitat.browser`. Do not ship `com.kiwibrowser.browser`, `com.danosito.afterbird`, or Relixor's ID.
+Public APKs must use `app.canopy.browser`. Do not ship `com.kiwibrowser.browser` or `com.danosito.afterbird`.
