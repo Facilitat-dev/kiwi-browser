@@ -5,29 +5,29 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 CHROMIUM_VERSION_FILE="${REPO_ROOT}/CHROMIUM_VERSION"
-ARGS_VARIANT="${AFTERBIRD_ARGS_VARIANT:-test}"
+ARGS_VARIANT="${ARGS_VARIANT:-${AFTERBIRD_ARGS_VARIANT:-release}}"
 REFERENCE_ARGS_FILE=""  # derived from ARGS_VARIANT in main()
 PATCHES_DIR=""          # derived from CHROMIUM_MAJOR in main()
 
 # Paths (tracked in this repo) rsynced verbatim onto the Chromium checkout.
-# Everything else Afterbird carries is applied as patches/m<major>/*.patch.
+# Everything else is applied as patches/m<major>/*.patch.
 OVERLAY_PATHS=(
   "chrome/android/java/res_chromium_base"
 )
 
-WORKDIR="${AFTERBIRD_CHROMIUM_WORKDIR:-${HOME}/afterbird-chromium}"
-OUT_DIR="${AFTERBIRD_OUT_DIR:-out/afterbird_production}"
-TARGET="${AFTERBIRD_BUILD_TARGET:-chrome_public_apk}"
+WORKDIR="${CHROMIUM_WORKDIR:-${AFTERBIRD_CHROMIUM_WORKDIR:-${REPO_ROOT}/chromium}}"
+OUT_DIR="${CHROMIUM_OUT_DIR:-${AFTERBIRD_OUT_DIR:-out/android_arm64}}"
+TARGET="${BUILD_TARGET:-${AFTERBIRD_BUILD_TARGET:-chrome_public_apk}}"
 FULL_BUILD=0
-CHROMIUM_SRC_GIT_URL="${AFTERBIRD_CHROMIUM_SRC_GIT_URL:-https://chromium.googlesource.com/chromium/src.git}"
-FETCH_RETRIES="${AFTERBIRD_FETCH_RETRIES:-3}"
-FETCH_BACKOFF_SECONDS="${AFTERBIRD_FETCH_BACKOFF_SECONDS:-10}"
-FETCH_TIMEOUT_SECONDS="${AFTERBIRD_FETCH_TIMEOUT_SECONDS:-600}"
-GCLIENT_RETRIES="${AFTERBIRD_GCLIENT_RETRIES:-2}"
-GCLIENT_BACKOFF_SECONDS="${AFTERBIRD_GCLIENT_BACKOFF_SECONDS:-20}"
-GCLIENT_NO_HISTORY="${AFTERBIRD_GCLIENT_NO_HISTORY:-1}"
-GCLIENT_EXTRA_ARGS="${AFTERBIRD_GCLIENT_EXTRA_ARGS:-}"
-FORCE_WORKSPACE_CONFIG="${AFTERBIRD_FORCE_WORKSPACE_CONFIG:-0}"
+CHROMIUM_SRC_GIT_URL="${CHROMIUM_SRC_GIT_URL:-${AFTERBIRD_CHROMIUM_SRC_GIT_URL:-https://chromium.googlesource.com/chromium/src.git}}"
+FETCH_RETRIES="${FETCH_RETRIES:-${AFTERBIRD_FETCH_RETRIES:-3}}"
+FETCH_BACKOFF_SECONDS="${FETCH_BACKOFF_SECONDS:-${AFTERBIRD_FETCH_BACKOFF_SECONDS:-10}}"
+FETCH_TIMEOUT_SECONDS="${FETCH_TIMEOUT_SECONDS:-${AFTERBIRD_FETCH_TIMEOUT_SECONDS:-1800}}"
+GCLIENT_RETRIES="${GCLIENT_RETRIES:-${AFTERBIRD_GCLIENT_RETRIES:-2}}"
+GCLIENT_BACKOFF_SECONDS="${GCLIENT_BACKOFF_SECONDS:-${AFTERBIRD_GCLIENT_BACKOFF_SECONDS:-20}}"
+GCLIENT_NO_HISTORY="${GCLIENT_NO_HISTORY:-${AFTERBIRD_GCLIENT_NO_HISTORY:-1}}"
+GCLIENT_EXTRA_ARGS="${GCLIENT_EXTRA_ARGS:-${AFTERBIRD_GCLIENT_EXTRA_ARGS:-}}"
+FORCE_WORKSPACE_CONFIG="${FORCE_WORKSPACE_CONFIG:-${AFTERBIRD_FORCE_WORKSPACE_CONFIG:-0}}"
 # 0 disables git's stall detector; googlesource pack preparation can stall >60s.
 GIT_LOW_SPEED_LIMIT="${AFTERBIRD_GIT_LOW_SPEED_LIMIT:-0}"
 GIT_LOW_SPEED_TIME="${AFTERBIRD_GIT_LOW_SPEED_TIME:-300}"
@@ -264,6 +264,24 @@ checkout_tag() {
   popd >/dev/null
 }
 
+install_build_deps() {
+  local script="${WORKDIR}/src/build/install-build-deps.sh"
+  if [[ ! -f "${script}" ]]; then
+    warn "No install-build-deps.sh yet; skipping (tag checkout may have failed)"
+    return 0
+  fi
+  if [[ "${SKIP_INSTALL_BUILD_DEPS:-0}" == "1" ]]; then
+    log "Skipping install-build-deps (SKIP_INSTALL_BUILD_DEPS=1)"
+    return 0
+  fi
+  log "Installing Chromium host deps (android). Requires sudo."
+  # --no-prompt is supported on current Chromium; fall back if the flag set changes.
+  if sudo "${script}" --android --no-prompt --no-chromeos-fonts; then
+    return 0
+  fi
+  sudo "${script}" --android --no-prompt
+}
+
 sync_dependencies() {
   local sync_args=(-D)
   if [[ "${GCLIENT_NO_HISTORY}" == "1" ]]; then
@@ -303,7 +321,7 @@ apply_overlay() {
     die "Overlay manifest is empty"
   fi
 
-  log "Applying Afterbird overlay onto Chromium tree (include-list: ${OVERLAY_PATHS[*]})"
+  log "Applying branding overlay onto Chromium tree (include-list: ${OVERLAY_PATHS[*]})"
   rsync -a --from0 --files-from="${manifest}" "${REPO_ROOT}/" "${WORKDIR}/src/"
   rm -f "${manifest}"
 }
@@ -447,9 +465,14 @@ main() {
   REFERENCE_ARGS_FILE="${REPO_ROOT}/.build/args/${ARGS_VARIANT}.gn"
   [[ -f "${REFERENCE_ARGS_FILE}" ]] || die "Missing args variant file: ${REFERENCE_ARGS_FILE}"
 
-  if ! command -v gclient >/dev/null 2>&1 && [[ -d "${HOME}/depot_tools" ]]; then
-    export PATH="${HOME}/depot_tools:${PATH}"
-    log "Added ${HOME}/depot_tools to PATH"
+  if ! command -v gclient >/dev/null 2>&1; then
+    if [[ -d "${HOME}/depot_tools" ]]; then
+      export PATH="${HOME}/depot_tools:${PATH}"
+      log "Added ${HOME}/depot_tools to PATH"
+    elif [[ -d "${REPO_ROOT}/depot_tools" ]]; then
+      export PATH="${REPO_ROOT}/depot_tools:${PATH}"
+      log "Added ${REPO_ROOT}/depot_tools to PATH"
+    fi
   fi
 
   require_cmd awk
@@ -481,6 +504,7 @@ main() {
 
   ensure_workspace
   checkout_tag "${tag}"
+  install_build_deps
   sync_dependencies
   clean_source_tree
   apply_overlay

@@ -4,17 +4,19 @@ A full Chromium Android build needs a 64-bit Linux machine, ~100 GB disk, and se
 
 ## Path we actually use (Afterbird / Chromium 151)
 
-This repo is a **delta**, not a Chromium checkout. Compilation happens in an external tree pinned to `CHROMIUM_VERSION` (`151.0.7922.38`).
+This repo is a **delta**, not a Chromium checkout. Compilation happens in `chromium/` (gitignored), pinned to `CHROMIUM_VERSION` (`153.0.8010.39`).
 
 ```bash
-# Default: checkout + sync + overlay + git apply patches/m151 + gn gen + graph check
+# Checkout + sync + overlay + patches/m153 + gn gen + graph check
 ./ci/chromium_android_pipeline.sh
 
-# Real APK
-AFTERBIRD_ARGS_VARIANT=release ./ci/chromium_android_pipeline.sh --full-build
+# Real APK (16 GB RAM: the pipeline caps ninja jobs)
+./ci/chromium_android_pipeline.sh --full-build
 ```
 
-The pipeline rsyncs `chrome/android/java/res_chromium_base` (our strings) and applies `patches/m151/*.patch`. GN args: `.build/args/test.gn` (debuggable, harness) or `.build/args/release.gn` (`is_official_build=true`). Both set `is_desktop_android = true` and `chrome_public_manifest_package = "dev.facilitat.browser"`.
+The pipeline rsyncs `chrome/android/java/res_chromium_base` and applies `patches/m153/*.patch`. GN args: `.build/args/test.gn` or `.build/args/release.gn`. Both set `is_desktop_android = true`, `chrome_public_manifest_package = "dev.facilitat.browser"`, and the privacy flags in [PRIVACY.md](PRIVACY.md).
+
+Default workspace: `chromium/` in this repo. Override with `CHROMIUM_WORKDIR`.
 
 ## What the five patches do
 

@@ -11,12 +11,11 @@ github = "Facilitat-dev"
 copyright = "Facilitat-dev"
 
 [engine]
-# Afterbird's verified baseline. This is the build pin.
-chromium = "151.0.7922.38"
-# Relixor/Kiwi overlay last engine (reference only, not the build).
+# Live pin (Chrome 153 stable line, 2026-09).
+chromium = "153.0.8010.39"
+# Afterbird last verified APK engine.
+afterbird_verified = "151.0.7922.38"
 kiwi_last_release = "137.0.7337.0"
-# Chromium stable as of 2026-09, next rebase target.
-target_chromium = "152.0.7977.82"
 
 [references]
 # Engineering: tiny Chromium 151 delta, real APKs, MV2 on desktop-android.

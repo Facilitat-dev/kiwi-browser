@@ -10,7 +10,8 @@ Not affiliated with Geometry OU, [Afterbird](https://github.com/danosito/afterbi
 |---|---|
 | Display name | Facilitat Browser (working title — rename before a public APK) |
 | Application ID | `dev.facilitat.browser` |
-| Engine | Chromium **151.0.7922.38** |
+| Engine | Chromium **153.0.8010.39** |
+| Privacy | No Google keys, no field trials, no reporting (see [docs/PRIVACY.md](docs/PRIVACY.md)) |
 | Owner | [Facilitat-dev](https://github.com/Facilitat-dev) |
 
 This repo is indexed by graft (`graft/`). Ask the graph before grepping.
@@ -23,24 +24,26 @@ This repo is indexed by graft (`graft/`). Ask the graph before grepping.
 
 **Lineage — Kiwi.** Original org forked under Facilitat-dev as `kiwi-*`. Overlay identity cuts (no `*.kiwibrowser.com`, package ID change) live on [kiwi-src-next](https://github.com/Facilitat-dev/kiwi-src-next).
 
-## Layout
+## One repo
+
+Kiwi split itself into 14 GitHub repos because their CI could not hold Chromium. That split is lineage, not a working model. **This repository is the only tree you work in.** Chromium is an external checkout at `chromium/` (gitignored). Why the 14 repos existed: [docs/REPOS.md](docs/REPOS.md).
 
 ```
-patches/m151/   live Afterbird series (MV2, Web Store UA, phone menu)
-patches/legacy-kiwi/   Chromium 80-era Kiwi patches (reference only)
-branding/       identity.toml, GN args, Android string overlay
-ci/             Afterbird Chromium Android pipeline
-chrome/android/java/res_chromium_base  → branding overlay (pipeline path)
-graft/          context graph
-vendor/         local clones (gitignored): afterbird, relixor, kiwi-*
+patches/m153/     live series (Afterbird MV2/Web Store + privacy flags in GN)
+patches/m151/     Afterbird-verified copies
+patches/legacy-kiwi/  Chromium 80-era Kiwi patches (reference)
+branding/         identity, GN args, Android strings
+ci/               Chromium Android pipeline
+chromium/         local engine checkout (not committed)
 ```
 
 ## Build
 
 ```bash
-./scripts/clone-upstream.sh
-# Tens of GB. Afterbird pipeline: pin 151.0.7922.38, apply patches/m151, gn gen.
-AFTERBIRD_ARGS_VARIANT=release ./ci/chromium_android_pipeline.sh --full-build
+# First time: depot_tools + Chromium 153 tag + gclient sync. Tens of GB, long.
+./ci/chromium_android_pipeline.sh
+# APK
+./ci/chromium_android_pipeline.sh --full-build
 ```
 
-Smoke-only (no ninja) is the default without `--full-build`. See [docs/BUILD.md](docs/BUILD.md).
+See [docs/BUILD.md](docs/BUILD.md) and [docs/PRIVACY.md](docs/PRIVACY.md).
