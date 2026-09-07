@@ -37,6 +37,5 @@ safe_browsing_use_unrar = false
 proprietary_codecs = true
 ffmpeg_branding = "Chrome"
 enable_widevine = false
-enable_nacl = false
 enable_pdf = false
 enable_plugins = false
