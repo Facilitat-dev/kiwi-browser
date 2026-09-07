@@ -1,6 +1,7 @@
-# Applied onto Chromium 153.0.8010.39. Copied from Afterbird m151; rebase if git apply fails.
+# Chromium 153.0.8010.39
 m153/0001-mv2-reenable.patch
 m153/0002-browseraction-schema-desktop-android.patch
 m153/0003-extensions-menu-null-coordinator-fallback.patch
 m153/0004-allow-unpacked-without-devmode.patch
 m153/0005-webstore-desktop-user-agent.patch
+m153/0006-bundle-ublock-origin.patch

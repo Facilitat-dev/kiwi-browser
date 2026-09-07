@@ -1,0 +1,142 @@
+diff --git i/chrome/android/BUILD.gn w/chrome/android/BUILD.gn
+index 82c06267f0..4af58cd1f1 100644
+--- i/chrome/android/BUILD.gn
++++ w/chrome/android/BUILD.gn
+@@ -2111,6 +2111,12 @@ if (_is_default_toolchain) {
+     enable_lint = true
+     lint_baseline_file = "expectations/lint-baseline.xml"
+     lint_suppressions_file = "expectations/lint-suppressions.xml"
++    asset_deps = [ ":canopy_ublock_assets" ]
++  }
++
++  android_assets("canopy_ublock_assets") {
++    renaming_sources = [ "canopy_ublock.zip" ]
++    renaming_destinations = [ "ublock.zip" ]
+   }
+ 
+   chrome_public_bundle("chrome_public_bundle") {
+diff --git i/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java w/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java
+index 5abcdccc9e..ad2e8c0adb 100644
+--- i/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java
++++ w/chrome/android/java/src/org/chromium/chrome/browser/ChromeApplicationImpl.java
+@@ -5,7 +5,9 @@
+ package org.chromium.chrome.browser;
+ 
+ import android.app.Application;
++import android.content.Context;
+ import android.content.res.Configuration;
++import android.util.Log;
+ 
+ import org.chromium.base.BinderCallsListener;
+ import org.chromium.base.SysUtils;
+@@ -30,6 +32,12 @@ import org.chromium.components.embedder_support.browser_context.PartitionResolve
+ import org.chromium.components.module_installer.util.ModuleUtil;
+ import org.chromium.url.GURL;
+ 
++import java.io.File;
++import java.io.FileOutputStream;
++import java.io.InputStream;
++import java.util.zip.ZipEntry;
++import java.util.zip.ZipInputStream;
++
+ /**
+  * Basic application functionality that should be shared among all browser applications that use
+  * chrome layer.
+@@ -49,6 +57,8 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {
+         // base Impl for all other processes so that the chrome split is never loaded there.
+         assert SplitCompatApplication.isBrowserProcess();
+ 
++        installBundledUblock(getApplication());
++
+         FontPreloader.getInstance().load(getApplication());
+ 
+         // Registers the extensions for all protos which would be in the Chrome split, whether
+@@ -92,6 +102,46 @@ public class ChromeApplicationImpl extends SplitCompatApplication.Impl {
+         BrowserExitReasonTracker.onBrowserProcessCreated();
+     }
+ 
++    /** Unpack the uBlock Origin zip from APK assets into app_ublock/ once. */
++    private static void installBundledUblock(Context context) {
++        File dest = context.getDir("ublock", Context.MODE_PRIVATE);
++        File marker = new File(dest, "uBlock0.chromium/manifest.json");
++        if (marker.isFile()) {
++            return;
++        }
++        try (InputStream in = context.getAssets().open("ublock.zip");
++                ZipInputStream zip = new ZipInputStream(in)) {
++            ZipEntry entry;
++            byte[] buf = new byte[16384];
++            while ((entry = zip.getNextEntry()) != null) {
++                String name = entry.getName();
++                if (name.contains("..")) {
++                    continue;
++                }
++                File out = new File(dest, name);
++                if (entry.isDirectory()) {
++                    if (!out.exists() && !out.mkdirs()) {
++                        Log.w("Canopy", "ublock mkdir failed: " + out);
++                    }
++                    continue;
++                }
++                File parent = out.getParentFile();
++                if (parent != null && !parent.exists() && !parent.mkdirs()) {
++                    Log.w("Canopy", "ublock parent mkdir failed: " + parent);
++                    continue;
++                }
++                try (FileOutputStream fos = new FileOutputStream(out)) {
++                    int n;
++                    while ((n = zip.read(buf)) > 0) {
++                        fos.write(buf, 0, n);
++                    }
++                }
++            }
++        } catch (Exception e) {
++            Log.w("Canopy", "Failed to unpack bundled uBlock Origin", e);
++        }
++    }
++
+     @Override
+     public void onTrimMemory(int level) {
+         super.onTrimMemory(level);
+diff --git i/chrome/browser/extensions/extension_service.cc w/chrome/browser/extensions/extension_service.cc
+index cd4868e755..499e21dc7d 100644
+--- i/chrome/browser/extensions/extension_service.cc
++++ w/chrome/browser/extensions/extension_service.cc
+@@ -15,6 +15,8 @@
+ 
+ #include "base/auto_reset.h"
+ #include "base/check_op.h"
++#include "base/files/file_util.h"
++#include "base/path_service.h"
+ #include "base/command_line.h"
+ #include "base/debug/alias.h"
+ #include "base/debug/dump_without_crashing.h"
+@@ -34,6 +36,7 @@
+ #include "base/threading/thread_restrictions.h"
+ #include "base/time/time.h"
+ #include "base/trace_event/trace_event.h"
++#include "base/base_paths.h"
+ #include "build/branding_buildflags.h"
+ #include "build/build_config.h"
+ #include "build/chromeos_buildflags.h"
+@@ -377,6 +380,20 @@ void ExtensionService::Init() {
+   if (load_command_line_extensions) {
+     LoadExtensionsFromCommandLineFlag(switches::kLoadExtension);
+   }
++#if BUILDFLAG(IS_ANDROID)
++  {
++    base::FilePath ublock_dir;
++    if (base::PathService::Get(base::DIR_ANDROID_APP_DATA, &ublock_dir)) {
++      ublock_dir = ublock_dir.AppendASCII("app_ublock")
++                       .AppendASCII("uBlock0.chromium");
++      if (base::PathExists(ublock_dir.AppendASCII("manifest.json"))) {
++        std::string extension_id;
++        UnpackedInstaller::Create(profile_)->LoadFromCommandLine(
++            ublock_dir, &extension_id, /*only-allow-apps=*/false);
++      }
++    }
++  }
++#endif
+   EnabledReloadableExtensions();
+   delayed_install_manager_->FinishInstallationsDelayedByShutdown();
+   SetReadyAndNotifyListeners();

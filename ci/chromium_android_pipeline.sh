@@ -320,6 +320,15 @@ apply_overlay() {
   mkdir -p "${dest}"
   log "Merging branding overlay ${BRANDING_SRC} -> ${dest}"
   rsync -a "${BRANDING_SRC}/" "${dest}/"
+
+  local ublock_src="${REPO_ROOT}/third_party/extensions/ublock/uBlock0_1.62.0.chromium.zip"
+  local ublock_dest="${WORKDIR}/src/chrome/android/canopy_ublock.zip"
+  if [[ -f "${ublock_src}" ]]; then
+    log "Copying bundled uBlock Origin zip into Chromium tree"
+    cp -f "${ublock_src}" "${ublock_dest}"
+  else
+    die "Missing uBlock zip: ${ublock_src} (run ci/fetch_ublock_chromium.sh)"
+  fi
 }
 
 apply_patches() {
@@ -354,6 +363,17 @@ run_gn_checks() {
   local out_path="${WORKDIR}/src/${OUT_DIR}"
   mkdir -p "${out_path}"
   cp "${REFERENCE_ARGS_FILE}" "${out_path}/args.gn"
+  local ks_env="${HOME}/.config/facilitat-browser/keystore.env"
+  if [[ -f "${ks_env}" ]]; then
+    # shellcheck disable=SC1090
+    source "${ks_env}"
+    {
+      echo "android_keystore_path = \"${ANDROID_KEYSTORE_PATH}\""
+      echo "android_keystore_name = \"${ANDROID_KEYSTORE_NAME}\""
+      echo "android_keystore_password = \"${ANDROID_KEYSTORE_PASSWORD}\""
+    } >> "${out_path}/args.gn"
+    log "Using local Canopy dev keystore"
+  fi
 
   pushd "${WORKDIR}/src" >/dev/null
   log "Running gn gen ${OUT_DIR}"

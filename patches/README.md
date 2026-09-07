@@ -1,6 +1,6 @@
 # Patches
 
-`series` is the ordered list applied onto Chromium 151.0.7922.38. Live patches are `m151/`, taken from Afterbird v1.9.1. The Kiwi files below target Chromium 80 and will not apply.
+Live series is `m153/` against Chromium 153.0.8010.39 (Afterbird extension patches rebased + Canopy uBlock bundle). `m151/` is the Afterbird-verified copy. `legacy-kiwi/` is Chromium 80 reference.
 
 ## legacy-kiwi/
 
