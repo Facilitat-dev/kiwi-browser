@@ -12,6 +12,8 @@ out/
 *.aab
 keystore.jks
 *.keystore
+third_party/extensions/ublock/*.zip
+third_party/extensions/ublock/*.crx
 
 # Editors / OS
 .idea/

@@ -18,6 +18,10 @@ The pipeline rsyncs `chrome/android/java/res_chromium_base` and applies `patches
 
 Default workspace: `chromium/` in this repo. Override with `CHROMIUM_WORKDIR`.
 
+Signing: `./scripts/make-keystore.sh` writes `~/.config/facilitat-browser/dev.keystore` (gitignored). Source `keystore.env` there when you want a signed APK. Debug/test APKs can use Chromium's default debug key.
+
+uBlock zip: `./ci/fetch_ublock_chromium.sh` (pinned 1.62.0, gitignored under `third_party/extensions/ublock/`).
+
 ## What the five patches do
 
 | Patch | Why |

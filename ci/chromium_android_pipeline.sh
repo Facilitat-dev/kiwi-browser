@@ -274,8 +274,12 @@ install_build_deps() {
     log "Skipping install-build-deps (SKIP_INSTALL_BUILD_DEPS=1)"
     return 0
   fi
+  if ! command -v apt-get >/dev/null 2>&1; then
+    # Debian-only script. Arch/Omarchy: Chromium's own CIPD toolchain arrives in gclient sync.
+    log "Non-Debian host; skipping install-build-deps.sh (set SKIP_INSTALL_BUILD_DEPS=0 and use a Debian chroot if you need it)"
+    return 0
+  fi
   log "Installing Chromium host deps (android). Requires sudo."
-  # --no-prompt is supported on current Chromium; fall back if the flag set changes.
   if sudo "${script}" --android --no-prompt --no-chromeos-fonts; then
     return 0
   fi

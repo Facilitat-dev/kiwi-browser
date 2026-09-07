@@ -1,6 +1,6 @@
 # Features we keep from Kiwi
 
-Afterbird already restored desktop Chrome extensions on Chromium 151 (`is_desktop_android=true` plus five patches). That is the behavior we ship, under our package ID. Relixor is the product feel we want (extensions-first, purple). Kiwi's extra UI (bottom bar, night mode, classic NTP) is backlog, not the first APK.
+See [V1.md](V1.md) for the first APK cut. Afterbird restored desktop Chrome extensions on Chromium 151; we are rebasing that onto 153. Relixor is the product feel (extensions-first, purple). Name and launcher icons are being designed outside this list. Kiwi extras (bottom bar, night mode, classic NTP) stay backlog.
 
 ## Afterbird already verified (v1.9.1)
 

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2026 Facilitat-dev
+Relixor-direction accent. App name and launcher icons are owned separately
+and land in this overlay when ready.
+-->
+<resources>
+    <color name="brand_accent">#FF8000FF</color>
+    <color name="brand_accent_dark">#FF4A0099</color>
+    <color name="brand_accent_light">#FFB266FF</color>
+</resources>
