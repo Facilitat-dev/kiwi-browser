@@ -9,6 +9,7 @@ is_official_build = false
 is_java_debug = true
 is_chrome_branded = false
 is_component_build = false
+use_v8_context_snapshot = false
 symbol_level = 0
 blink_symbol_level = 0
 dcheck_always_on = false

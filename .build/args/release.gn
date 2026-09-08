@@ -9,6 +9,8 @@ is_official_build = true
 is_chrome_branded = false
 is_component_build = false
 chrome_pgo_phase = 0
+# Skip host v8_context_snapshot_generator (pulls LiteRT LFS prebuilts).
+use_v8_context_snapshot = false
 symbol_level = 0
 blink_symbol_level = 0
 dcheck_always_on = false
