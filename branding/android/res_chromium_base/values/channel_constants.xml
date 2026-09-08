@@ -12,4 +12,19 @@ found in the LICENSE file.
     <string name="search_widget_title" translatable="false">Canopy search</string>
     <string name="quick_action_search_widget_title" translatable="false">Canopy quick action search</string>
     <string name="dino_widget_title" translatable="false">Canopy dino</string>
+
+    <!-- Folio Calm Sage. Chromium only lists channel_constants.xml in this overlay. -->
+    <color name="brand_paper">#FFF7F9F7</color>
+    <color name="brand_pine">#FF181C1A</color>
+    <color name="brand_cream_text">#FFE0E3DF</color>
+    <color name="brand_primary">#FF496556</color>
+    <color name="brand_sage_seed">#FF6B8E7D</color>
+    <color name="brand_sage_light">#FF98B4A4</color>
+    <color name="brand_container">#FF2F483D</color>
+    <color name="brand_clay">#FFD4B197</color>
+    <color name="brand_slate">#FFA6B7C6</color>
+    <color name="brand_outline">#FF3F4843</color>
+    <color name="brand_accent">#FF496556</color>
+    <color name="brand_accent_dark">#FF2F483D</color>
+    <color name="brand_accent_light">#FF98B4A4</color>
 </resources>
