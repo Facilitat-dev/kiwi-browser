@@ -310,7 +310,8 @@ clean_source_tree() {
   pushd "${WORKDIR}/src" >/dev/null
   log "Resetting source tree to a clean ${PWD} state before overlay"
   git reset --hard HEAD
-  git clean -ffd
+  # One -f only: a second -f deletes nested DEPS checkouts (LiteRT, etc.).
+  git clean -fd -e out -e third_party/litert
   popd >/dev/null
 }
 
