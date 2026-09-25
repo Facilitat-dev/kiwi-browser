@@ -1,0 +1,182 @@
+diff --git a/ui/android/BUILD.gn b/ui/android/BUILD.gn
+index 3fac808..c47fb3a 100644
+--- a/ui/android/BUILD.gn
++++ b/ui/android/BUILD.gn
+@@ -346,6 +346,7 @@ android_resources("ui_java_resources") {
+     "java/res/values-sw720dp/values.xml",
+     "java/res/values-v31/colors.xml",
+     "java/res/values/attrs.xml",
++    "java/res/values/canopy_theme_colors.xml",
+     "java/res/values/color_palette.xml",
+     "java/res/values/dimens.xml",
+     "java/res/values/font_certs.xml",
+diff --git a/ui/android/java/res/values/canopy_theme_colors.xml b/ui/android/java/res/values/canopy_theme_colors.xml
+new file mode 100644
+index 0000000..110e80c
+--- /dev/null
++++ b/ui/android/java/res/values/canopy_theme_colors.xml
+@@ -0,0 +1,38 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++Copyright 2026 Facilitat-dev
++Use of this source code is governed by a BSD-style license that can be
++found in the LICENSE file.
++-->
++
++<resources>
++    <!-- Canopy purple / AMOLED. Chrome theme roles in 0013 point here.
++         Light container, paper elevation, and incognito neutrals exist so
++         Material color roles have a value. They are not a second accent. -->
++    <color name="canopy_accent">#FF8000FF</color>
++    <color name="canopy_accent_pressed">#FF6A00D6</color>
++    <color name="canopy_accent_container">#FF2A1048</color>
++    <color name="canopy_accent_container_light">#FFE4D4FF</color>
++    <color name="canopy_surface">#FF0B0B10</color>
++    <color name="canopy_surface_high">#FF16141C</color>
++    <color name="canopy_surface_highest">#FF221E2C</color>
++    <color name="canopy_on_surface">#FFF2F0F7</color>
++    <color name="canopy_on_surface_variant">#FFB7B3C2</color>
++    <color name="canopy_on_accent">#FFFFFFFF</color>
++    <color name="canopy_outline">#FF3D3450</color>
++    <color name="canopy_paper">#FFF7F5FC</color>
++    <color name="canopy_paper_high">#FFE8E2F4</color>
++    <color name="canopy_on_paper">#FF16141C</color>
++    <color name="canopy_primary_95">#FFF4ECFF</color>
++    <color name="canopy_primary_90">#FFE4D4FF</color>
++    <color name="canopy_primary_80">#FFC9A6FF</color>
++    <color name="canopy_primary_70">#FFA66BFF</color>
++    <color name="canopy_primary_60">#FF9333FF</color>
++    <color name="canopy_primary_50">#FF8914FF</color>
++    <color name="canopy_primary_20">#FF3D0080</color>
++    <color name="canopy_incognito_surface">#FF000000</color>
++    <color name="canopy_incognito_surface_high">#FF101014</color>
++    <color name="canopy_incognito_on_surface">#FFE4E2EA</color>
++    <color name="canopy_incognito_accent">#FFBDBAC8</color>
++    <color name="canopy_incognito_outline">#FF2A2A32</color>
++</resources>
+diff --git a/ui/android/java/res/values/color_palette.xml b/ui/android/java/res/values/color_palette.xml
+index 260496e..fe6d6d4 100644
+--- a/ui/android/java/res/values/color_palette.xml
++++ b/ui/android/java/res/values/color_palette.xml
+@@ -8,24 +8,25 @@ found in the LICENSE file.
+     <!-- 2021 color palette. -->
+     <color name="baseline_error_80">#F2B8B5</color>
+     <color name="baseline_error_40">#B3261E</color>
+-    <color name="baseline_primary_100">@android:color/white</color>
+-    <color name="baseline_primary_95">#ECF3FE</color>
+-    <color name="baseline_primary_90">#D3E3FD</color>
+-    <color name="baseline_primary_80">#A8C7FA</color>
+-    <color name="baseline_primary_80_alpha_10" tools:ignore="UnusedResources">#19A8C7FA</color>
+-    <color name="baseline_primary_80_alpha_20">#33A8C7FA</color>
+-    <color name="baseline_primary_70">#7CACF8</color>
+-    <color name="baseline_primary_60">#4C8DF6</color>
+-    <color name="baseline_primary_50">#1B6EF3</color>
+-    <color name="baseline_primary_40">#0B57D0</color>
+-    <color name="baseline_primary_40_alpha_6">#0F0B57D0</color>
+-    <color name="baseline_primary_40_alpha_12">#1F0B57D0</color>
+-    <color name="baseline_primary_40_alpha_24">#3D0B57D0</color>
+-    <color name="baseline_primary_40_alpha_65" tools:ignore="UnusedResources">#6A0B57D0</color>
+-    <color name="baseline_primary_30">#0842A0</color>
+-    <color name="baseline_primary_20">#062E6F</color>
+-    <color name="baseline_primary_20_alpha_38">#61062E6F</color>
+-    <color name="baseline_primary_10">#041E49</color>
++    <!-- Canopy: Google blue baseline retargeted at canopy_theme_colors.xml. -->
++    <color name="baseline_primary_100">@color/canopy_on_accent</color>
++    <color name="baseline_primary_95">@color/canopy_primary_95</color>
++    <color name="baseline_primary_90">@color/canopy_primary_90</color>
++    <color name="baseline_primary_80">@color/canopy_primary_80</color>
++    <color name="baseline_primary_80_alpha_10" tools:ignore="UnusedResources">#19C9A6FF</color>
++    <color name="baseline_primary_80_alpha_20">#33C9A6FF</color>
++    <color name="baseline_primary_70">@color/canopy_primary_70</color>
++    <color name="baseline_primary_60">@color/canopy_primary_60</color>
++    <color name="baseline_primary_50">@color/canopy_primary_50</color>
++    <color name="baseline_primary_40">@color/canopy_accent</color>
++    <color name="baseline_primary_40_alpha_6">#0F8000FF</color>
++    <color name="baseline_primary_40_alpha_12">#1F8000FF</color>
++    <color name="baseline_primary_40_alpha_24">#3D8000FF</color>
++    <color name="baseline_primary_40_alpha_65" tools:ignore="UnusedResources">#6A8000FF</color>
++    <color name="baseline_primary_30">@color/canopy_accent_pressed</color>
++    <color name="baseline_primary_20">@color/canopy_primary_20</color>
++    <color name="baseline_primary_20_alpha_38">#613D0080</color>
++    <color name="baseline_primary_10">@color/canopy_accent_container</color>
+     <color name="baseline_neutral_100">@android:color/white</color>
+     <color name="baseline_neutral_100_alpha_10">#19FFFFFF</color>
+     <color name="baseline_neutral_100_alpha_16">#29FFFFFF</color>
+@@ -75,21 +76,22 @@ found in the LICENSE file.
+     <color name="baseline_neutral_variant_50">#747775</color>
+     <color name="baseline_neutral_variant_30">#444746</color>
+     <color name="baseline_neutral_variant_30_alpha_20">#33444746</color>
+-    <color name="baseline_secondary_95">#DFF3FF</color>
+-    <color name="baseline_secondary_90">#C2E7FF</color>
+-    <color name="baseline_secondary_90_with_neutral_10_alpha_8">#B3D7EF</color>
+-    <color name="baseline_secondary_90_with_neutral_10_alpha_24">#94B7CF</color>
+-    <color name="baseline_secondary_80">#7FCFFF</color>
+-    <color name="baseline_secondary_70">#5AB3F0</color>
+-    <color name="baseline_secondary_70_with_neutral_90_alpha_8">#53A7E1</color>
+-    <color name="baseline_secondary_70_with_neutral_90_alpha_24">#448FC4</color>
+-    <color name="baseline_secondary_60">#3998D3</color>
+-    <color name="baseline_secondary_50">#047DB7</color>
+-    <color name="baseline_secondary_40">#00639B</color>
+-    <color name="baseline_secondary_35">#005789</color>
+-    <color name="baseline_secondary_30">#004A77</color>
+-    <color name="baseline_secondary_25">#003F66</color>
+-    <color name="baseline_secondary_10">#001D35</color>
++    <!-- Canopy: secondary ramp follows the same purple so chips are not Google blue. -->
++    <color name="baseline_secondary_95">@color/canopy_primary_95</color>
++    <color name="baseline_secondary_90">@color/canopy_accent_container_light</color>
++    <color name="baseline_secondary_90_with_neutral_10_alpha_8">#D2C2EE</color>
++    <color name="baseline_secondary_90_with_neutral_10_alpha_24">#B7A6D4</color>
++    <color name="baseline_secondary_80">@color/canopy_primary_80</color>
++    <color name="baseline_secondary_70">@color/canopy_primary_70</color>
++    <color name="baseline_secondary_70_with_neutral_90_alpha_8">#9A62EE</color>
++    <color name="baseline_secondary_70_with_neutral_90_alpha_24">#8456CC</color>
++    <color name="baseline_secondary_60">@color/canopy_primary_60</color>
++    <color name="baseline_secondary_50">@color/canopy_primary_50</color>
++    <color name="baseline_secondary_40">@color/canopy_accent</color>
++    <color name="baseline_secondary_35">@color/canopy_accent_pressed</color>
++    <color name="baseline_secondary_30">#5C00C0</color>
++    <color name="baseline_secondary_25">@color/canopy_primary_20</color>
++    <color name="baseline_secondary_10">@color/canopy_accent_container</color>
+     <color name="baseline_tertiary_90">#C4EED0</color>
+     <color name="baseline_tertiary_80">#6DD58C</color>
+     <color name="baseline_tertiary_40">#146C2E</color>
+@@ -97,22 +99,23 @@ found in the LICENSE file.
+     <color name="baseline_tertiary_10">#072711</color>
+ 
+     <!-- GM3 Baseline colors. See https://crbug.com/1410537. -->
+-    <color name="gm3_baseline_surface_tint_light">#6991D6</color>
+-    <color name="gm3_baseline_surface_tint_dark">#D1E1FF</color>
+-    <color name="gm3_baseline_surface_container_light">#F0F4F9</color>
+-    <color name="gm3_baseline_surface_container_dark">#1E1F20</color>
+-    <color name="gm3_baseline_surface_light">#FFFFFF</color>
+-    <color name="gm3_baseline_surface_dark">#131314</color>
+-    <color name="gm3_baseline_surface_container_low_light">#F8FAFD</color>
+-    <color name="gm3_baseline_surface_container_low_dark">#1B1B1B</color>
+-    <color name="gm3_baseline_surface_container_high_light">#E9EEF6</color>
+-    <color name="gm3_baseline_surface_container_high_dark">#282A2C</color>
+-    <color name="gm3_baseline_surface_container_highest_light">#DDE3EA</color>
+-    <color name="gm3_baseline_surface_container_highest_dark">#333537</color>
+-    <color name="gm3_baseline_surface_bright_light">@color/gm3_baseline_surface_light</color>
+-    <color name="gm3_baseline_surface_bright_dark">#37393B</color>
+-    <color name="gm3_baseline_surface_dim_light">#D3DBE5</color>
+-    <color name="gm3_baseline_surface_dim_dark">@color/gm3_baseline_surface_dark</color>
++    <!-- Canopy: light surfaces are paper; dark surfaces are AMOLED, not grey 900. -->
++    <color name="gm3_baseline_surface_tint_light">@color/canopy_primary_80</color>
++    <color name="gm3_baseline_surface_tint_dark">@color/canopy_primary_80</color>
++    <color name="gm3_baseline_surface_container_light">@color/canopy_paper_high</color>
++    <color name="gm3_baseline_surface_container_dark">@color/canopy_surface_high</color>
++    <color name="gm3_baseline_surface_light">@color/canopy_paper</color>
++    <color name="gm3_baseline_surface_dark">@color/canopy_surface</color>
++    <color name="gm3_baseline_surface_container_low_light">@color/canopy_paper</color>
++    <color name="gm3_baseline_surface_container_low_dark">@color/canopy_surface</color>
++    <color name="gm3_baseline_surface_container_high_light">@color/canopy_paper_high</color>
++    <color name="gm3_baseline_surface_container_high_dark">@color/canopy_surface_high</color>
++    <color name="gm3_baseline_surface_container_highest_light">@color/canopy_paper_high</color>
++    <color name="gm3_baseline_surface_container_highest_dark">@color/canopy_surface_highest</color>
++    <color name="gm3_baseline_surface_bright_light">@color/canopy_paper</color>
++    <color name="gm3_baseline_surface_bright_dark">@color/canopy_surface_highest</color>
++    <color name="gm3_baseline_surface_dim_light">@color/canopy_paper_high</color>
++    <color name="gm3_baseline_surface_dim_dark">@color/canopy_surface</color>
+ 
+     <!-- System colors that point to the baseline palette for below Android S.-->
+     <color name="system_neutral1_10">@color/baseline_neutral_99</color>

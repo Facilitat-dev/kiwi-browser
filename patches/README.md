@@ -1,6 +1,8 @@
 # Patches
 
-Live series is `m153/` against Chromium 153.0.8010.39 (Afterbird extension patches rebased + Canopy uBlock bundle). `m151/` is the Afterbird-verified copy. `legacy-kiwi/` is Chromium 80 reference.
+Live series is `m153/` against Chromium 153.0.8010.39 (Afterbird extension patches rebased + Canopy uBlock bundle + purple chrome tokens). `m151/` is the Afterbird-verified copy. `legacy-kiwi/` is Chromium 80 reference.
+
+`0012` adds the purple / AMOLED color resources Chromium compiles. `0013` points chrome theme roles (accent, toolbar, omnibox, switches, NTP, settings) at those resources, defaults the UI to dark, and keeps incognito on a darker neutral surface. `0014`–`0016` put the phone toolbar at the bottom, keep it from sliding off on scroll, and open the app menu upward. `0017`–`0018` keep the overflow Extensions row and host extension action icons on the phone toolbar. None of these patches change `is_desktop_android`.
 
 ## legacy-kiwi/
 

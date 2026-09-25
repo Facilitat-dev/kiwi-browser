@@ -1,0 +1,41 @@
+diff --git i/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionController.java w/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionController.java
+index d127d3b..51e2102 100644
+--- i/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionController.java
++++ w/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionController.java
+@@ -248,6 +248,12 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
+         mToolbarLayout = toolbarLayout;
+         mTopControlsStacker = topControlsStacker;
+         mBottomControlsStacker = bottomControlsStacker;
++        // This controller exists only when toolbar position customization is enabled
++        // (phone, not tablet, not a custom tab). Keep top controls from sliding away
++        // so a user who picks Top still has an always-visible bar. Bottom uses
++        // NEVER_SCROLL_OFF on the bottom toolbar layer. Fullscreen can still hide
++        // controls via BrowserControlsState.HIDDEN.
++        mTopControlsStacker.setScrollingDisabled(true);
+         mBottomSheetController = bottomSheetController;
+         mBrowserControlsOffsetSupplier = browserControlsOffsetSupplier;
+         mToolbarProgressBarContainer = toolbarProgressBarContainer;
+@@ -304,7 +310,9 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
+ 
+                     @Override
+                     public int getScrollBehavior() {
+-                        return LayerScrollBehavior.DEFAULT_SCROLL_OFF;
++                        // Min height includes this layer, so content scroll cannot slide the
++                        // bottom toolbar off screen.
++                        return LayerScrollBehavior.NEVER_SCROLL_OFF;
+                     }
+ 
+                     @Override
+diff --git i/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionControllerTest.java w/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionControllerTest.java
+index db1981a..23b0574 100644
+--- i/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionControllerTest.java
++++ w/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionControllerTest.java
+@@ -598,7 +598,7 @@ public class ToolbarPositionControllerTest {
+                 mBottomControlsStacker.getLayerForTesting(LayerType.BOTTOM_TOOLBAR);
+         assertEquals(TOOLBAR_HEIGHT, toolbarLayer.getHeight());
+         assertEquals(LayerVisibility.VISIBLE, toolbarLayer.getLayerVisibility());
+-        assertEquals(LayerScrollBehavior.DEFAULT_SCROLL_OFF, toolbarLayer.getScrollBehavior());
++        assertEquals(LayerScrollBehavior.NEVER_SCROLL_OFF, toolbarLayer.getScrollBehavior());
+ 
+         toolbarLayer.onBrowserControlsOffsetUpdate(12);
+         verify(mControlContainerView).setTranslationY(12);

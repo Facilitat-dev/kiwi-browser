@@ -1,6 +1,6 @@
 # Canopy brand kit
 
-Privacy-centric browser for Android and Linux. Palette: **Folio Calm Sage**.
+Privacy-centric browser for Android and Linux. In-app palette: **Canopy purple / AMOLED** (`identity.toml`).
 
 ## Start here
 
@@ -37,12 +37,12 @@ canopy-branding/
 
 | Token | Hex |
 |---|---|
-| primary | `#496556` |
-| sage seed | `#6B8E7D` |
-| sage light | `#98B4A4` |
-| container | `#2F483D` |
-| clay | `#D4B197` |
-| slate | `#A6B7C6` |
-| paper | `#F7F9F7` |
-| pine | `#181C1A` |
-| cream text | `#E0E3DF` |
+| accent | `#8000FF` |
+| accent pressed | `#6A00D6` |
+| accent container | `#2A1048` |
+| surface | `#0B0B10` |
+| surface high | `#16141C` |
+| on surface | `#F2F0F7` |
+| on accent | `#FFFFFF` |
+| outline | `#3D3450` |
+| paper | `#F7F5FC` |
