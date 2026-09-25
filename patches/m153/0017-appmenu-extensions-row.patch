@@ -1,0 +1,344 @@
+diff --git i/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java w/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
+index e4548b2..9bf3ce3 100644
+--- i/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
++++ w/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
+@@ -71,7 +71,6 @@ import org.chromium.chrome.browser.ui.appmenu.AppMenuDelegate;
+ import org.chromium.chrome.browser.ui.appmenu.AppMenuHandler;
+ import org.chromium.chrome.browser.ui.appmenu.AppMenuItemProperties;
+ import org.chromium.chrome.browser.ui.default_browser_promo.DefaultBrowserPromoUtils;
+-import org.chromium.chrome.browser.ui.extensions.ExtensionUi;
+ import org.chromium.chrome.browser.ui.favicon.FaviconHelper;
+ import org.chromium.chrome.browser.ui.favicon.FaviconUtils;
+ import org.chromium.chrome.browser.ui.lens.LensOverlayTabHelper;
+@@ -1066,8 +1065,11 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+     }
+ 
+     private boolean shouldShowExtensionsItem() {
+-        // TODO(crbug.com/422307625): Remove this check once extensions are ready for dogfooding.
+-        return ExtensionUi.isEnabled(getProfileFromTabModel());
++        // Canopy: phone overflow is the way to chrome://extensions. Afterbird
++        // opens that URL when the desktop extensions coordinator is null.
++        // Stock hides the row unless the extension UI backend is linked; keep
++        // the row either way so the entry does not depend on that backend.
++        return true;
+     }
+ 
+     private ListItem buildExtensionsParentItem() {
+diff --git i/chrome/android/junit/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegateUnitTest.java w/chrome/android/junit/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegateUnitTest.java
+index ce71ecf..5e95b4a 100644
+--- i/chrome/android/junit/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegateUnitTest.java
++++ w/chrome/android/junit/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegateUnitTest.java
+@@ -149,7 +149,6 @@ import org.chromium.components.commerce.core.CommerceFeatureUtilsJni;
+ import org.chromium.components.commerce.core.ShoppingService;
+ import org.chromium.components.content_settings.ContentSetting;
+ import org.chromium.components.dom_distiller.core.DomDistillerUrlUtilsJni;
+-import org.chromium.components.extensions.ExtensionsBuildflags;
+ import org.chromium.components.favicon.LargeIconBridge;
+ import org.chromium.components.favicon.LargeIconBridgeJni;
+ import org.chromium.components.power_bookmarks.PowerBookmarkMeta;
+@@ -634,14 +633,12 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+                                 item(R.id.downloads_menu_id),
+                                 getExpectedBookmarksParentMenuItem()));
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(
+-                    item(
+-                            R.id.extensions_parent_menu_id,
+-                            item(R.id.extensions_menu_menu_id),
+-                            item(R.id.manage_extensions_menu_id),
+-                            item(R.id.extensions_webstore_menu_id)));
+-        }
++        expectedItems.add(
++                item(
++                        R.id.extensions_parent_menu_id,
++                        item(R.id.extensions_menu_menu_id),
++                        item(R.id.manage_extensions_menu_id),
++                        item(R.id.extensions_webstore_menu_id)));
+ 
+         expectedItems.add(
+                 item(
+@@ -696,9 +693,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+                                 item(R.id.all_bookmarks_menu_id),
+                                 item(R.id.recent_tabs_menu_id)));
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(item(R.id.extensions_menu_menu_id));
+-        }
++        expectedItems.add(item(R.id.extensions_menu_menu_id));
+ 
+         expectedItems.addAll(
+                 Arrays.asList(
+@@ -745,14 +740,12 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+                                 item(R.id.downloads_menu_id),
+                                 getExpectedBookmarksParentMenuItem()));
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(
+-                    item(
+-                            R.id.extensions_parent_menu_id,
+-                            item(R.id.extensions_menu_menu_id),
+-                            item(R.id.manage_extensions_menu_id),
+-                            item(R.id.extensions_webstore_menu_id)));
+-        }
++        expectedItems.add(
++                item(
++                        R.id.extensions_parent_menu_id,
++                        item(R.id.extensions_menu_menu_id),
++                        item(R.id.manage_extensions_menu_id),
++                        item(R.id.extensions_webstore_menu_id)));
+ 
+         expectedItems.add(
+                 item(
+@@ -818,9 +811,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+                                 item(R.id.all_bookmarks_menu_id),
+                                 item(R.id.recent_tabs_menu_id)));
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(item(R.id.extensions_menu_menu_id));
+-        }
++        expectedItems.add(item(R.id.extensions_menu_menu_id));
+ 
+         expectedItems.addAll(
+                 Arrays.asList(
+@@ -892,20 +883,18 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+         expectedItems.add(getExpectedBookmarksParentMenuItem());
+         expectedTitles.add(getExpectedBookmarksParentMenuTitle());
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(
+-                    item(
+-                            R.id.extensions_parent_menu_id,
+-                            item(R.id.extensions_menu_menu_id),
+-                            item(R.id.manage_extensions_menu_id),
+-                            item(R.id.extensions_webstore_menu_id)));
+-            expectedTitles.add(
+-                    item(
+-                            R.string.menu_extensions,
+-                            item(R.string.menu_extensions_menu),
+-                            item(R.string.menu_manage_extensions),
+-                            item(R.string.menu_chrome_webstore)));
+-        }
++        expectedItems.add(
++                item(
++                        R.id.extensions_parent_menu_id,
++                        item(R.id.extensions_menu_menu_id),
++                        item(R.id.manage_extensions_menu_id),
++                        item(R.id.extensions_webstore_menu_id)));
++        expectedTitles.add(
++                item(
++                        R.string.menu_extensions,
++                        item(R.string.menu_extensions_menu),
++                        item(R.string.menu_manage_extensions),
++                        item(R.string.menu_chrome_webstore)));
+ 
+         expectedItems.add(
+                 item(
+@@ -1114,10 +1103,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+         expectedItems.add(item(R.id.recent_tabs_menu_id));
+         expectedTitles.add(item(R.string.menu_recent_tabs));
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(item(R.id.extensions_menu_menu_id));
+-            expectedTitles.add(item(R.string.menu_extensions_menu));
+-        }
++        expectedItems.add(item(R.id.extensions_menu_menu_id));
++        expectedTitles.add(item(R.string.menu_extensions_menu));
+ 
+         expectedItems.add(item(R.id.divider_line_id));
+         expectedTitles.add(item(0));
+@@ -1219,20 +1206,18 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+         expectedItems.add(getExpectedBookmarksParentMenuItem());
+         expectedTitles.add(getExpectedBookmarksParentMenuTitle());
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(
+-                    item(
+-                            R.id.extensions_parent_menu_id,
+-                            item(R.id.extensions_menu_menu_id),
+-                            item(R.id.manage_extensions_menu_id),
+-                            item(R.id.extensions_webstore_menu_id)));
+-            expectedTitles.add(
+-                    item(
+-                            R.string.menu_extensions,
+-                            item(R.string.menu_extensions_menu),
+-                            item(R.string.menu_manage_extensions),
+-                            item(R.string.menu_chrome_webstore)));
+-        }
++        expectedItems.add(
++                item(
++                        R.id.extensions_parent_menu_id,
++                        item(R.id.extensions_menu_menu_id),
++                        item(R.id.manage_extensions_menu_id),
++                        item(R.id.extensions_webstore_menu_id)));
++        expectedTitles.add(
++                item(
++                        R.string.menu_extensions,
++                        item(R.string.menu_extensions_menu),
++                        item(R.string.menu_manage_extensions),
++                        item(R.string.menu_chrome_webstore)));
+ 
+         expectedItems.add(
+                 item(
+@@ -1421,10 +1406,8 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+         expectedItems.add(item(R.id.all_bookmarks_menu_id));
+         expectedTitles.add(item(R.string.menu_bookmarks));
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(item(R.id.extensions_menu_menu_id));
+-            expectedTitles.add(item(R.string.menu_extensions_menu));
+-        }
++        expectedItems.add(item(R.id.extensions_menu_menu_id));
++        expectedTitles.add(item(R.string.menu_extensions_menu));
+ 
+         expectedItems.add(item(R.id.divider_line_id));
+         expectedTitles.add(item(0));
+@@ -1596,20 +1579,18 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+         expectedItems.add(getExpectedBookmarksParentMenuItem());
+         expectedTitles.add(getExpectedBookmarksParentMenuTitle());
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(
+-                    item(
+-                            R.id.extensions_parent_menu_id,
+-                            item(R.id.extensions_menu_menu_id),
+-                            item(R.id.manage_extensions_menu_id),
+-                            item(R.id.extensions_webstore_menu_id)));
+-            expectedTitles.add(
+-                    item(
+-                            R.string.menu_extensions,
+-                            item(R.string.menu_extensions_menu),
+-                            item(R.string.menu_manage_extensions),
+-                            item(R.string.menu_chrome_webstore)));
+-        }
++        expectedItems.add(
++                item(
++                        R.id.extensions_parent_menu_id,
++                        item(R.id.extensions_menu_menu_id),
++                        item(R.id.manage_extensions_menu_id),
++                        item(R.id.extensions_webstore_menu_id)));
++        expectedTitles.add(
++                item(
++                        R.string.menu_extensions,
++                        item(R.string.menu_extensions_menu),
++                        item(R.string.menu_manage_extensions),
++                        item(R.string.menu_chrome_webstore)));
+ 
+         expectedItems.add(
+                 item(
+@@ -1746,14 +1727,12 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+                                 item(R.id.downloads_menu_id),
+                                 getExpectedBookmarksParentMenuItem()));
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(
+-                    item(
+-                            R.id.extensions_parent_menu_id,
+-                            item(R.id.extensions_menu_menu_id),
+-                            item(R.id.manage_extensions_menu_id),
+-                            item(R.id.extensions_webstore_menu_id)));
+-        }
++        expectedItems.add(
++                item(
++                        R.id.extensions_parent_menu_id,
++                        item(R.id.extensions_menu_menu_id),
++                        item(R.id.manage_extensions_menu_id),
++                        item(R.id.extensions_webstore_menu_id)));
+ 
+         expectedItems.add(
+                 item(
+@@ -1829,14 +1808,12 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+                                 item(R.id.downloads_menu_id),
+                                 getExpectedBookmarksParentMenuItem()));
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(
+-                    item(
+-                            R.id.extensions_parent_menu_id,
+-                            item(R.id.extensions_menu_menu_id),
+-                            item(R.id.manage_extensions_menu_id),
+-                            item(R.id.extensions_webstore_menu_id)));
+-        }
++        expectedItems.add(
++                item(
++                        R.id.extensions_parent_menu_id,
++                        item(R.id.extensions_menu_menu_id),
++                        item(R.id.manage_extensions_menu_id),
++                        item(R.id.extensions_webstore_menu_id)));
+ 
+         expectedItems.add(
+                 item(
+@@ -2161,9 +2138,7 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+                                 item(R.id.all_bookmarks_menu_id),
+                                 item(R.id.recent_tabs_menu_id)));
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(item(R.id.extensions_menu_menu_id));
+-        }
++        expectedItems.add(item(R.id.extensions_menu_menu_id));
+ 
+         expectedItems.addAll(
+                 Arrays.asList(
+@@ -2256,14 +2231,12 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+                                 item(R.id.downloads_menu_id),
+                                 getExpectedBookmarksParentMenuItem()));
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(
+-                    item(
+-                            R.id.extensions_parent_menu_id,
+-                            item(R.id.extensions_menu_menu_id),
+-                            item(R.id.manage_extensions_menu_id),
+-                            item(R.id.extensions_webstore_menu_id)));
+-        }
++        expectedItems.add(
++                item(
++                        R.id.extensions_parent_menu_id,
++                        item(R.id.extensions_menu_menu_id),
++                        item(R.id.manage_extensions_menu_id),
++                        item(R.id.extensions_webstore_menu_id)));
+ 
+         expectedItems.add(
+                 item(
+@@ -2371,14 +2344,12 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+                                 item(R.id.downloads_menu_id),
+                                 getExpectedBookmarksParentMenuItem()));
+ 
+-        if (ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            expectedItems.add(
+-                    item(
+-                            R.id.extensions_parent_menu_id,
+-                            item(R.id.extensions_menu_menu_id),
+-                            item(R.id.manage_extensions_menu_id),
+-                            item(R.id.extensions_webstore_menu_id)));
+-        }
++        expectedItems.add(
++                item(
++                        R.id.extensions_parent_menu_id,
++                        item(R.id.extensions_menu_menu_id),
++                        item(R.id.manage_extensions_menu_id),
++                        item(R.id.extensions_webstore_menu_id)));
+ 
+         expectedItems.add(
+                 item(
+@@ -3538,10 +3509,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+     @Test
+     @Config(qualifiers = "sw320dp")
+     public void testPageMenuItems_ExtensionsSubmenu() {
+-        if (!ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            return;
+-        }
+-
+         setUpMocksForPageMenu();
+         setMenuOptions(new MenuOptions());
+         doReturn(true).when(mTabbedAppMenuPropertiesDelegate).shouldShowIconBeforeItem();
+@@ -3579,10 +3546,6 @@ public class TabbedAppMenuPropertiesDelegateUnitTest {
+     @Config(qualifiers = "sw320dp")
+     @DisableFeatures({ChromeFeatureList.SUBMENUS_IN_APP_MENU})
+     public void testPageMenuItems_ExtensionsItem_SubmenusDisabled() {
+-        if (!ExtensionsBuildflags.ENABLE_EXTENSIONS_CORE) {
+-            return;
+-        }
+-
+         setUpMocksForPageMenu();
+         setMenuOptions(new MenuOptions());
+ 

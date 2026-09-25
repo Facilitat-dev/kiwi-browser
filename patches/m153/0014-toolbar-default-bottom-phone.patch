@@ -1,0 +1,199 @@
+diff --git i/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionController.java w/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionController.java
+index 43bebc6..d127d3b 100644
+--- i/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionController.java
++++ w/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionController.java
+@@ -663,11 +663,10 @@ public class ToolbarPositionController implements OnSharedPreferenceChangeListen
+             boolean doesUserPreferTopToolbar,
+             @ControlsPosition int currentPosition) {
+         @ControlsPosition int newControlsPosition;
+-        if (ntpShowing
+-                || tabSwitcherShowing
+-                || isOmniboxFocused
+-                || isFindInPageShowing
+-                || doesUserPreferTopToolbar) {
++        // NTP and a focused omnibox stay at the user's position. A phone cold start is
++        // the NTP, and suggestions grow upward only while the bar remains at the bottom.
++        // Tab switcher and find-in-page still use the top anchor.
++        if (tabSwitcherShowing || isFindInPageShowing || doesUserPreferTopToolbar) {
+             newControlsPosition = ControlsPosition.TOP;
+         } else {
+             newControlsPosition = ControlsPosition.BOTTOM;
+diff --git i/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionControllerTest.java w/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionControllerTest.java
+index b299389..db1981a 100644
+--- i/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionControllerTest.java
++++ w/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/ToolbarPositionControllerTest.java
+@@ -388,7 +388,7 @@ public class ToolbarPositionControllerTest {
+                 ToolbarPositionController::resetCachedToolbarConfigurationForTesting);
+         mStartupExpectation =
+                 HistogramWatcher.newSingleRecordWatcher(
+-                        "Android.ToolbarPosition.PositionAtStartup", ControlsPosition.TOP);
++                        "Android.ToolbarPosition.PositionAtStartup", ControlsPosition.BOTTOM);
+ 
+         mController =
+                 new ToolbarPositionController(
+@@ -502,7 +502,8 @@ public class ToolbarPositionControllerTest {
+     @Test
+     @Config(qualifiers = "sw400dp")
+     public void testUpdatePositionChangesWithPref() {
+-        assertControlsAtTop();
++        // Cold start with no pref is the bottom toolbar.
++        assertControlsAtBottom();
+         setUserToolbarAnchorPreference(/* showToolbarOnTop= */ false);
+         assertControlsAtBottom();
+         verify(mPrefs, times(1))
+@@ -521,7 +522,7 @@ public class ToolbarPositionControllerTest {
+         assertControlsAtBottom();
+ 
+         mIsNtpShowing.set(true);
+-        assertControlsAtTop();
++        assertControlsAtBottom();
+ 
+         mIsNtpShowing.set(false);
+         assertControlsAtBottom();
+@@ -547,7 +548,7 @@ public class ToolbarPositionControllerTest {
+         assertControlsAtBottom();
+ 
+         mIsOmniboxFocused.set(true);
+-        assertControlsAtTop();
++        assertControlsAtBottom();
+ 
+         mIsOmniboxFocused.set(false);
+         assertControlsAtBottom();
+@@ -632,7 +633,7 @@ public class ToolbarPositionControllerTest {
+         BottomControlsLayer progressBarLayer =
+                 mBottomControlsStacker.getLayerForTesting(LayerType.PROGRESS_BAR);
+ 
+-        mIsOmniboxFocused.set(true);
++        mIsFindInPageShowing.set(true);
+         assertControlsAtTop();
+         mBrowserControlsObserver.onBottomControlsHeightAnimationEnded();
+ 
+@@ -666,7 +667,7 @@ public class ToolbarPositionControllerTest {
+                         ControlsPosition.BOTTOM));
+ 
+         assertEquals(
+-                StateTransition.SNAP_TO_TOP,
++                StateTransition.NONE,
+                 ToolbarPositionController.calculateStateTransition(
+                         prefStateChanged,
+                         true,
+@@ -705,7 +706,7 @@ public class ToolbarPositionControllerTest {
+                         ControlsPosition.BOTTOM));
+ 
+         assertEquals(
+-                StateTransition.SNAP_TO_TOP,
++                StateTransition.NONE,
+                 ToolbarPositionController.calculateStateTransition(
+                         prefStateChanged,
+                         ntpShowing,
+@@ -832,14 +833,13 @@ public class ToolbarPositionControllerTest {
+         Tab tab = mock(Tab.class);
+         doReturn(new GURL(UrlConstantResolver.getOriginalNativeNtpUrl())).when(tab).getUrl();
+ 
+-        // By default, Toolbar should be anchored on top.
++        // Explicit top still anchors the NTP toolbar on top. null writes TOP_SETTINGS.
+         setUserToolbarAnchorPreference(/* showToolbarOnTop= */ null);
+         assertTrue(ToolbarPositionController.shouldShowToolbarOnTop(tab));
+ 
+-        // When the user explicitly asks for bottom toolbar, NTP should still show that toolbar on
+-        // top.
++        // A bottom preference keeps the NTP toolbar at the bottom.
+         setUserToolbarAnchorPreference(/* showToolbarOnTop= */ false);
+-        assertTrue(ToolbarPositionController.shouldShowToolbarOnTop(tab));
++        assertFalse(ToolbarPositionController.shouldShowToolbarOnTop(tab));
+ 
+         // ... NTP always shows toolbar on top.
+         setUserToolbarAnchorPreference(/* showToolbarOnTop= */ true);
+@@ -1054,6 +1054,8 @@ public class ToolbarPositionControllerTest {
+ 
+     @Test
+     public void testDestroy() {
++        setUserToolbarAnchorPreference(/* showToolbarOnTop= */ true);
++        assertControlsAtTop();
+         mController.destroy();
+         setUserToolbarAnchorPreference(/* showToolbarOnTop= */ false);
+         assertControlsAtTop();
+@@ -1062,22 +1064,11 @@ public class ToolbarPositionControllerTest {
+     @Test
+     @EnableFeatures(ChromeFeatureList.NEW_TAB_PAGE_CUSTOMIZATION_V2)
+     public void testMaybeForceBottomToolbarLayoutUpdateAndCapture() {
+-        // 1. Test mIsFirstPositionChange is true.
+-        assertTrue(mController.getIsFirstPositionChangeForTesting());
+-        // After setUp, mIsFirstPositionChange is true because initial position (TOP) didn't change.
+-        mController.maybeForceBottomToolbarLayoutUpdateAndCapture(/* isNtpShowing= */ true);
+-        verify(mControlContainer, never()).doSynchronousLayout(anyBoolean());
+-
+-        // Trigger a position change to set mIsFirstPositionChange to false.
+-        setUserToolbarAnchorPreference(false); // Changes to BOTTOM
++        // Cold start moves the bar to the bottom and consumes the first position change.
++        assertFalse(mController.getIsFirstPositionChangeForTesting());
+         assertControlsAtBottom();
+-        // During this first change, maybeForceToolbarLayoutUpdateAndCapture() was called inside
+-        // updateCurrentPosition(), but mIsFirstPositionChange was still true, so it did nothing.
+         verify(mControlContainer, never()).doSynchronousLayout(anyBoolean());
+ 
+-        // mIsFirstPositionChange is now false.
+-        assertFalse(mController.getIsFirstPositionChangeForTesting());
+-
+         // 2. Test active tab is NTP.
+         mController.maybeForceBottomToolbarLayoutUpdateAndCapture(/* isNtpShowing= */ true);
+         verify(mControlContainer, never()).doSynchronousLayout(anyBoolean());
+@@ -1278,15 +1269,15 @@ public class ToolbarPositionControllerTest {
+                 mBottomControlsStacker.getLayerForTesting(LayerType.BOTTOM_TOOLBAR);
+         assertEquals(LayerVisibility.VISIBLE, toolbarLayer.getLayerVisibility());
+ 
+-        // Simulate Omnibox Focus -> Should SNAP to TOP.
+-        mIsOmniboxFocused.set(true);
++        // Find-in-page still snaps to the top immediately (not an animated hide).
++        mIsFindInPageShowing.set(true);
+         assertControlsAtTop();
+ 
+         // It should be in HIDDEN state IMMEDIATELY, not HIDING.
+         assertEquals(LayerVisibility.HIDDEN, toolbarLayer.getLayerVisibility());
+ 
+-        // Simulate Omnibox Unfocus -> Should SNAP to BOTTOM.
+-        mIsOmniboxFocused.set(false);
++        // Leaving find-in-page snaps back to the bottom.
++        mIsFindInPageShowing.set(false);
+         assertControlsAtBottom();
+ 
+         // It should be in VISIBLE state IMMEDIATELY, not SHOWING.
+diff --git i/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/settings/AddressBarPreference.java w/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/settings/AddressBarPreference.java
+index 1f79e58..3a0fbc2 100644
+--- i/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/settings/AddressBarPreference.java
++++ w/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/settings/AddressBarPreference.java
+@@ -48,10 +48,11 @@ public class AddressBarPreference extends ContainedRadioButtonGroupPreference
+     private RadioButtonWithDescription mBottomButton;
+     private @HighlightedOption int mHighlightedOption;
+ 
+-    // We choose this as a "default return value" because top omnibox is the default today. Choose
+-    // TOP_SETTINGS because TOP_LONG_PRESS causes an animation (see ToolbarPositionController).
++    // Unset prefs cold-start the phone toolbar at the bottom. BOTTOM_SETTINGS (not
++    // BOTTOM_LONG_PRESS) avoids a position animation on first show. An explicit Top or
++    // Bottom choice still wins. Tablet does not construct ToolbarPositionController.
+     private static final @ToolbarPositionAndSource int DEFAULT_POSITION_AND_SOURCE =
+-            ToolbarPositionAndSource.TOP_SETTINGS;
++            ToolbarPositionAndSource.BOTTOM_SETTINGS;
+ 
+     public AddressBarPreference(Context context, AttributeSet attrs) {
+         super(context, attrs);
+@@ -95,8 +96,8 @@ public class AddressBarPreference extends ContainedRadioButtonGroupPreference
+ 
+     /**
+      * Returns whether the toolbar is user-configured to show on top. If no value has been set
+-     * explicitly by the user a default param is used. The value of the default param is
+-     * configurable for experimental purposes but defaults to top.
++     * explicitly by the user, the toolbar defaults to the bottom. Tablet does not apply
++     * toolbar position customization, so it stays top.
+      */
+     public static boolean isToolbarConfiguredToShowOnTop() {
+         // enumToBoolean is true if position is bottom, but this method wants whether it's on top.
+@@ -256,6 +257,7 @@ public class AddressBarPreference extends ContainedRadioButtonGroupPreference
+ 
+     private static @ToolbarPositionAndSource int fromLocalState(boolean isInBottomPosition) {
+         if (isInBottomPosition) return ToolbarPositionAndSource.BOTTOM_SETTINGS;
+-        return DEFAULT_POSITION_AND_SOURCE;
++        // Explicit top in local state must not follow DEFAULT (bottom).
++        return ToolbarPositionAndSource.TOP_SETTINGS;
+     }
+ }

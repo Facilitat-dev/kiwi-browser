@@ -47,6 +47,8 @@ None of slices 1–7 are implemented yet (0003 only covers null-coordinator fall
 
 **Accept:** cold start phone = bottom bar always visible; menu/suggestions open upward.
 
+**Landed:** `0014` defaults an unset `Chrome.Toolbar.TopAnchored` to bottom. Tablet never constructs `ToolbarPositionController`, so it stays top. NTP and omnibox focus no longer force the bar to the top, so a cold NTP stays bottom and suggestion layout uses the existing bottom-toolbar path. Settings Top/Bottom still writes `TOP_SETTINGS` / `BOTTOM_SETTINGS`. `0015` marks the bottom toolbar layer `NEVER_SCROLL_OFF` and disables top-controls scrolling for the life of the phone controller. `0016` places the overflow menu above the anchor when controls are at the bottom (`EndIconMenuAnimBottom` is already in 153). Tab switcher and find-in-page still move the bar to the top.
+
 ---
 
 ## Slice 3 — Classic tile NTP
@@ -73,6 +75,8 @@ None of slices 1–7 are implemented yet (0003 only covers null-coordinator fall
 - Do not ship UI with extensions but no way to invoke actions.
 
 **Accept:** Overflow → Extensions works; CWS + uBlock still work; action icons reachable on phone.
+
+**Landed:** `0017` always shows the overflow Extensions row (`extensions_menu_menu_id`, or the Extensions parent when submenus are on). The click path is still Afterbird `0003`: the desktop coordinator when it exists, otherwise `chrome://extensions`. `0018` adds `extensions_toolbar_container_stub` to `toolbar_phone.xml` and constructs `ExtensionsToolbarCoordinator` with the phone toolbar, so action icons inflate in the button row when desktop-android has linked the extension UI. `is_desktop_android` stays true.
 
 ---
 

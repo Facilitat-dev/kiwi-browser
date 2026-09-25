@@ -1,0 +1,135 @@
+diff --git i/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java w/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
+index 4dea03c..84833f1 100644
+--- i/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
++++ w/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenu.java
+@@ -525,7 +525,8 @@ class AppMenu implements OnKeyListener {
+                         popupWidth,
+                         popupHeight,
+                         anchorView.getRootView().getLayoutDirection(),
+-                        mPositionBelowAnchor);
++                        mPositionBelowAnchor,
++                        controlsPosition);
+         popup.setContentView(contentView);
+ 
+         mHierarchicalMenuController.setupFlyoutController(
+@@ -674,7 +675,8 @@ class AppMenu implements OnKeyListener {
+             int popupWidth,
+             int popupHeight,
+             int viewLayoutDirection,
+-            boolean positionBelowAnchor) {
++            boolean positionBelowAnchor,
++            @ControlsPosition int controlsPosition) {
+         anchorView.getLocationInWindow(tempLocation);
+         int anchorViewX = tempLocation[0];
+         int anchorViewY = tempLocation[1];
+@@ -722,6 +724,10 @@ class AppMenu implements OnKeyListener {
+         } else {
+             if (positionBelowAnchor) {
+                 offsets[1] = anchorView.getHeight() - padding.top;
++            } else if (controlsPosition == ControlsPosition.BOTTOM) {
++                // Bottom toolbar: stay end-aligned with the button and open upward.
++                // isFromBottomBar places X at the screen edge instead.
++                offsets[1] = -popupHeight + padding.bottom;
+             } else {
+                 offsets[1] = -negativeSoftwareVerticalOffset;
+             }
+diff --git i/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuPopupPositionTest.java w/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuPopupPositionTest.java
+index d321988..5cba4a4 100644
+--- i/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuPopupPositionTest.java
++++ w/chrome/browser/ui/android/appmenu/internal/java/src/org/chromium/chrome/browser/ui/appmenu/AppMenuPopupPositionTest.java
+@@ -23,6 +23,7 @@ import org.mockito.invocation.InvocationOnMock;
+ import org.robolectric.annotation.Config;
+ 
+ import org.chromium.base.test.BaseRobolectricTestRunner;
++import org.chromium.chrome.browser.browser_controls.BrowserControlsStateProvider.ControlsPosition;
+ import org.chromium.chrome.browser.ui.appmenu.internal.R;
+ 
+ /** Tests AppMenu#getPopupPosition. */
+@@ -146,6 +147,41 @@ public class AppMenuPopupPositionTest {
+         Assert.assertEquals("Incorrect popup y", expectedY, results[1]);
+     }
+ 
++    @Test
++    public void testBottomAnchoredToolbarButton_LTR() {
++        int[] results =
++                getPopupPosition(
++                        false,
++                        false,
++                        Surface.ROTATION_0,
++                        View.LAYOUT_DIRECTION_LTR,
++                        false,
++                        ControlsPosition.BOTTOM);
++
++        // End-aligned with the toolbar button, opened upward so the menu stays on screen.
++        int expectedX = ANCHOR_X + ANCHOR_WIDTH - POPUP_WIDTH;
++        int expectedY = ANCHOR_Y - POPUP_HEIGHT + BG_PADDING;
++        Assert.assertEquals("Incorrect popup x", expectedX, results[0]);
++        Assert.assertEquals("Incorrect popup y", expectedY, results[1]);
++    }
++
++    @Test
++    public void testBottomAnchoredToolbarButton_RTL() {
++        int[] results =
++                getPopupPosition(
++                        false,
++                        false,
++                        Surface.ROTATION_0,
++                        View.LAYOUT_DIRECTION_RTL,
++                        false,
++                        ControlsPosition.BOTTOM);
++
++        int expectedX = ANCHOR_X;
++        int expectedY = ANCHOR_Y - POPUP_HEIGHT + BG_PADDING;
++        Assert.assertEquals("Incorrect popup x", expectedX, results[0]);
++        Assert.assertEquals("Incorrect popup y", expectedY, results[1]);
++    }
++
+     @Test
+     public void testBottomButton_LTR() {
+         int[] results =
+@@ -174,6 +210,22 @@ public class AppMenuPopupPositionTest {
+             int rotation,
+             int layoutDirection,
+             boolean mPositionBelowAnchor) {
++        return getPopupPosition(
++                isByPermanentButton,
++                isFromBottomBar,
++                rotation,
++                layoutDirection,
++                mPositionBelowAnchor,
++                ControlsPosition.TOP);
++    }
++
++    private int[] getPopupPosition(
++            boolean isByPermanentButton,
++            boolean isFromBottomBar,
++            int rotation,
++            int layoutDirection,
++            boolean mPositionBelowAnchor,
++            @ControlsPosition int controlsPosition) {
+         return AppMenu.getPopupPosition(
+                 mTempLocation,
+                 isByPermanentButton,
+@@ -186,6 +238,7 @@ public class AppMenuPopupPositionTest {
+                 POPUP_WIDTH,
+                 POPUP_HEIGHT,
+                 layoutDirection,
+-                mPositionBelowAnchor);
++                mPositionBelowAnchor,
++                controlsPosition);
+     }
+ }
+diff --git i/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/OmniboxSuggestionsDropdownEmbedderImpl.java w/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/OmniboxSuggestionsDropdownEmbedderImpl.java
+index d3c22f4..7877b4f 100644
+--- i/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/OmniboxSuggestionsDropdownEmbedderImpl.java
++++ w/chrome/browser/ui/android/omnibox/java/src/org/chromium/chrome/browser/omnibox/OmniboxSuggestionsDropdownEmbedderImpl.java
+@@ -290,6 +290,9 @@ class OmniboxSuggestionsDropdownEmbedderImpl
+ 
+         @ControlsPosition int controlsPosition = mControlsPositionSupplier.get();
+         if (controlsPosition == ControlsPosition.BOTTOM) {
++            // Suggestions fill the viewport above the bottom toolbar. The phone bar
++            // stays at the bottom while the omnibox is focused, so this path is used
++            // for the focused omnibox as well.
+             top = 0;
+         } else {
+             ViewUtils.getRelativeLayoutPosition(contentView, mAnchorView, mPositionArray);

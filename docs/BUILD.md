@@ -33,6 +33,11 @@ uBlock zip: `./ci/fetch_ublock_chromium.sh` (pinned 1.62.0, gitignored under `th
 | `0005-webstore-desktop-ua` | Chrome Web Store shows Install instead of "Available on desktop" |
 | `0012-canopy-purple-theme-tokens` | Purple / AMOLED colors in resources chrome compiles |
 | `0013-canopy-purple-wire-chrome-surfaces` | Theme roles, dark default, distinct incognito |
+| `0014-toolbar-default-bottom-phone` | Phone cold start uses the bottom toolbar; Settings Top/Bottom still works |
+| `0015-toolbar-always-on-no-autohide` | Phone toolbar does not slide away on scroll |
+| `0016-appmenu-omnibox-grow-upward` | Bottom-bar menu opens upward; suggestions already fill the space above |
+| `0017-appmenu-extensions-row` | Overflow Extensions row stays available for chrome://extensions |
+| `0018-extension-action-icons-phone` | Phone toolbar hosts clickable extension action icons |
 
 ## Package ID
 

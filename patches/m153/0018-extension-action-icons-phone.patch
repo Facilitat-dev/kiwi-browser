@@ -1,0 +1,55 @@
+diff --git i/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java w/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
+index d2a0603..a4091b6 100644
+--- i/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
++++ w/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
+@@ -2687,7 +2687,9 @@ public class ToolbarManager
+                                                         mActivityTabProvider.asObservable(),
+                                                         mTabCreatorManager.getTabCreator(false),
+                                                         getBrowsingModeThemeColorProvider(),
+-                                                        (ToolbarTablet) mToolbarLayout,
++                                                        // Phone toolbar hosts the same stub.
++                                                        // Do not require ToolbarTablet.
++                                                        mToolbarLayout,
+                                                         contextMenuPopulatorFactory,
+                                                         selectionDropdownMenuDelegate,
+                                                         mTabModelSelector,
+diff --git i/chrome/browser/ui/android/toolbar/java/res/layout/toolbar_phone.xml w/chrome/browser/ui/android/toolbar/java/res/layout/toolbar_phone.xml
+index 9e1f21d..ac69049 100644
+--- i/chrome/browser/ui/android/toolbar/java/res/layout/toolbar_phone.xml
++++ w/chrome/browser/ui/android/toolbar/java/res/layout/toolbar_phone.xml
+@@ -74,6 +74,13 @@ found in the LICENSE file.
+             android:layout_height="match_parent"
+             android:visibility="gone"/>
+ 
++        <ViewStub
++            android:id="@+id/extensions_toolbar_container_stub"
++            android:inflatedId="@+id/extensions_toolbar_container"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_gravity="top" />
++
+         <org.chromium.chrome.browser.toolbar.top.ToggleTabStackButton
+             android:id="@+id/tab_switcher_button"
+             style="@style/ToolbarHoverableButton"
+diff --git i/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java w/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
+index db4a1c7..a1dc107 100644
+--- i/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
++++ w/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/top/ToolbarPhone.java
+@@ -1705,6 +1705,17 @@ public class ToolbarPhone extends ToolbarLayout
+             }
+         }
+ 
++        // Extension action icons live in the button row. Draw them into the
++        // toolbar bitmap so they stay visible while browser controls are captured.
++        View extensionsToolbar =
++                mToolbarButtonsContainer.findViewById(R.id.extensions_toolbar_container);
++        if (extensionsToolbar != null && extensionsToolbar.getVisibility() == VISIBLE) {
++            canvas.save();
++            ViewUtils.translateCanvasToView(mToolbarButtonsContainer, extensionsToolbar, canvas);
++            extensionsToolbar.draw(canvas);
++            canvas.restore();
++        }
++
+         // Draw the tab stack button and associated text if necessary.
+         ToggleTabStackButtonCoordinator tabSwitcherButtonCoordinator =
+                 getTabSwitcherButtonCoordinator();

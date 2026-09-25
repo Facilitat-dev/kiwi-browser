@@ -7,3 +7,8 @@ m153/0005-webstore-desktop-user-agent.patch
 m153/0006-bundle-ublock-origin.patch
 m153/0012-canopy-purple-theme-tokens.patch
 m153/0013-canopy-purple-wire-chrome-surfaces.patch
+m153/0014-toolbar-default-bottom-phone.patch
+m153/0015-toolbar-always-on-no-autohide.patch
+m153/0016-appmenu-omnibox-grow-upward.patch
+m153/0017-appmenu-extensions-row.patch
+m153/0018-extension-action-icons-phone.patch
