@@ -1,14 +1,13 @@
 :root {
-  --canopy-sage-seed: #6B8E7D;
-  --canopy-primary: #496556;
-  --canopy-sage-light: #98B4A4;
-  --canopy-container: #2F483D;
-  --canopy-clay: #D4B197;
-  --canopy-slate: #A6B7C6;
-  --canopy-paper: #F7F9F7;
-  --canopy-pine: #181C1A;
-  --canopy-cream: #E0E3DF;
-  --canopy-outline: #3F4843;
+  --canopy-accent: #8000FF;
+  --canopy-accent-pressed: #6A00D6;
+  --canopy-accent-container: #2A1048;
+  --canopy-surface: #0B0B10;
+  --canopy-surface-high: #16141C;
+  --canopy-on-surface: #F2F0F7;
+  --canopy-on-accent: #FFFFFF;
+  --canopy-outline: #3D3450;
+  --canopy-paper: #F7F5FC;
 
   --canopy-font-display: "Exo 2", "Sora", "Outfit", system-ui, sans-serif;
   --canopy-font-ui: "Figtree", "Source Sans 3", "Inter", system-ui, sans-serif;

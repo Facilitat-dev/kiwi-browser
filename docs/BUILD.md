@@ -31,6 +31,8 @@ uBlock zip: `./ci/fetch_ublock_chromium.sh` (pinned 1.62.0, gitignored under `th
 | `0003-extensions-menu-npe` | Phone form factor opens `chrome://extensions` instead of crashing |
 | `0004-unpacked-without-devmode` | Load unpacked extensions without the desktop developer-mode toggle |
 | `0005-webstore-desktop-ua` | Chrome Web Store shows Install instead of "Available on desktop" |
+| `0012-canopy-purple-theme-tokens` | Purple / AMOLED colors in resources chrome compiles |
+| `0013-canopy-purple-wire-chrome-surfaces` | Theme roles, dark default, distinct incognito |
 
 ## Package ID
 

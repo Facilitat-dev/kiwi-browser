@@ -4,7 +4,7 @@ Use this file as the source of truth when generating UI, copy, icons, slides, st
 
 Companion files:
 - `tokens/tokens.json` — machine-readable colors, type, logo roles
-- `tokens/folio-calm-sage-swatches.svg` — official palette
+- `tokens/folio-calm-sage-swatches.svg` — previous sage sheet; do not use for chrome
 - `logos/` — marks, lockups, glyph, narrative emblem
 
 ---
@@ -31,34 +31,27 @@ Product name is always **Canopy**. Never “Canopy Browser” in the wordmark. I
 Voice example — good: “Trackers stay outside the canopy.”
 Voice example — bad: “UNLEASH MILITARY-GRADE ANONYMITY!!!”
 
-## 3. Color — Folio Calm Sage
+## 3. Color — Canopy purple / AMOLED
 
-Use only these tokens. Do not invent extra greens or cyans.
+In-app chrome uses this palette (`branding/identity.toml`). One accent. No sage, no Google Blue.
 
 | Token | Hex | Use |
 |---|---|---|
-| `paper` | `#F7F9F7` | Light surfaces |
-| `pine` | `#181C1A` | Dark surfaces, text on light |
-| `cream_text` | `#E0E3DF` | Text on dark |
-| `primary` | `#496556` | Primary actions, brand |
-| `sage_seed` | `#6B8E7D` | Secondary, hover, leaves |
-| `sage_light` | `#98B4A4` | Highlights, selected |
-| `container` | `#2F483D` | Elevated dark cards, nav |
-| `clay` | `#D4B197` | Rare warm accent (human, analog) |
-| `slate` | `#A6B7C6` | Cool accent, links on dark |
-| `outline` | `#3F4843` | Hairlines |
+| `accent` | `#8000FF` | Toggles, progress, selected, focus, active tab |
+| `accent_pressed` | `#6A00D6` | Pressed / ripple |
+| `accent_container` | `#2A1048` | Selected chips, extension badge field |
+| `surface` | `#0B0B10` | AMOLED page / NTP |
+| `surface_high` | `#16141C` | Toolbar, menus, sheets |
+| `on_surface` | `#F2F0F7` | Primary text and icons on dark |
+| `on_accent` | `#FFFFFF` | Text on purple |
+| `outline` | `#3D3450` | Hairlines |
+| `paper` | `#F7F5FC` | Light mode surfaces only |
 
 Rules:
-- Default product UI is **dark pine** with cream text. Light paper mode is supported.
-- Primary buttons: `primary` fill, `cream_text` label.
-- Clay is never a large fill. One warm note per composition max (book pages, a quote rule, an illustration highlight).
-- Do not use the original concept art’s electric cyan/teal. Recolor to sage.
-
-Contrast:
-- Cream on pine: body text
-- Pine on paper: body text
-- Sage light on pine: secondary
-- Never sage-seed text on container (too close)
+- Default product UI is **dark** (`surface` + `on_surface`). Light mode uses `paper` and still uses `accent`.
+- Primary buttons: `accent` fill, `on_accent` label.
+- Incognito is darker than `surface` and does not wash NTP tiles with `accent`.
+- Do not use the original concept art’s electric cyan/teal, and do not reintroduce Folio Calm Sage in chrome.
 
 ## 4. Type
 
@@ -104,11 +97,11 @@ Photography (if any): overcast woodland, paper, stone, linen. Desaturate toward 
 
 ## 7. UI notes for agents building the browser
 
-- Chrome is quiet. One accent at a time.
-- Private / shielded state uses `sage_light` on `container`, not a red recording dot.
-- Warning / insecure: use `clay` at low saturation plus plain language, not screaming orange.
-- Address bar on `container`, page canvas on `pine` or `paper`.
-- Tabs: hairline `outline`, active tab `primary` underline or sage-light pip.
+- Chrome is quiet. One accent (`accent`).
+- Private / shielded state uses `on_surface` on `accent_container`, not a red recording dot.
+- Warning / insecure: plain language, not screaming orange.
+- Address bar on `surface_high`, page canvas on `surface` or `paper`.
+- Tabs: hairline `outline`, active tab `accent` pip.
 - Empty states may use the glyph, not the full narrative emblem.
 
 ## 8. Copy patterns
@@ -126,13 +119,13 @@ Avoid:
 
 ## 9. Platforms
 
-Ship the same brand on Android and Linux. Do not fork colors per OS. Adaptive Android icon: sage glyph on pine, no OEM-colored theming of the mark itself.
+Ship the same brand on Android and Linux. Do not fork colors per OS. Adaptive Android icon stays the existing glyph; do not recolor launcher mipmaps for this palette cut.
 
 ## 10. Checklist before shipping a generated asset
 
-- [ ] Only Folio Calm Sage hexes
+- [ ] Only the Canopy purple / AMOLED hexes in section 3
 - [ ] Correct mark for the size
 - [ ] Exo 2 / Figtree (or named fallbacks)
 - [ ] Canopy spelled once, no tagline baked into the logo
-- [ ] Dark default looks like pine, not generic #000 or teal
+- [ ] Dark default looks like `surface` `#0B0B10`, not Google grey or teal
 - [ ] No teal leftover from the source concept art

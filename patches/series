@@ -5,3 +5,5 @@ m153/0003-extensions-menu-null-coordinator-fallback.patch
 m153/0004-allow-unpacked-without-devmode.patch
 m153/0005-webstore-desktop-user-agent.patch
 m153/0006-bundle-ublock-origin.patch
+m153/0012-canopy-purple-theme-tokens.patch
+m153/0013-canopy-purple-wire-chrome-surfaces.patch

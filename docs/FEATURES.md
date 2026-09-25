@@ -1,6 +1,6 @@
 # Features we keep from Kiwi
 
-See [V1.md](V1.md) for the first APK cut. Product is **Canopy** (Folio Calm Sage). Afterbird restored desktop Chrome extensions on Chromium 151; we rebase that onto 153. Kiwi extras (bottom bar, night mode, classic NTP) stay backlog.
+See [V1.md](V1.md) for the first APK cut. Product is **Canopy**. In-app chrome uses the purple / AMOLED palette in [UI-PORT.md](UI-PORT.md). Afterbird restored desktop Chrome extensions on Chromium 151; we rebase that onto 153. Kiwi extras (bottom bar, night mode, classic NTP) stay backlog.
 
 ## Afterbird already verified (v1.9.1)
 

@@ -12,7 +12,7 @@ Browse under cover.
 |---|---|
 | Name | **Canopy** |
 | Application ID | `app.canopy.browser` |
-| Palette | Folio Calm Sage (`branding/canopy-branding/`) |
+| Palette | Canopy purple / AMOLED (`branding/identity.toml`) |
 | Engine | Chromium **153.0.8010.39** |
 | Privacy | No Google keys, field trials, or reporting — [docs/PRIVACY.md](docs/PRIVACY.md) |
 | Owner | [Facilitat-dev](https://github.com/Facilitat-dev) |
@@ -23,7 +23,7 @@ This repo is indexed by graft (`graft/`). Ask the graph before grepping.
 
 **Engineering base — [Afterbird](https://github.com/danosito/afterbird).** Most active Kiwi successor. Tiny delta over stock Chromium 151 with `is_desktop_android=true`, five patches, real APKs, Chrome Web Store install, uBlock Origin 132/132. GitHub will not let us fork it (already forked `src.next` in the same network), so it lives under `vendor/afterbird` and its patch series is copied into `patches/m151/`.
 
-**Brand — Canopy / Folio Calm Sage.** Kit in `branding/canopy-branding/`. Launcher mipmaps are rasterized from `logos/canopy-app-icon.svg`.
+**Brand — Canopy / purple AMOLED.** Kit in `branding/canopy-branding/`. Launcher mipmaps are rasterized from `logos/canopy-app-icon.svg` and stay as-is for this cut.
 
 **Lineage — Kiwi.** Original org forked under Facilitat-dev as `kiwi-*`. Overlay identity cuts (no `*.kiwibrowser.com`, package ID change) live on [kiwi-src-next](https://github.com/Facilitat-dev/kiwi-src-next).
 
