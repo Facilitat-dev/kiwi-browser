@@ -1,0 +1,219 @@
+diff --git i/chrome/android/java/src/org/chromium/chrome/browser/firstrun/FirstRunFlowSequencer.java w/chrome/android/java/src/org/chromium/chrome/browser/firstrun/FirstRunFlowSequencer.java
+--- i/chrome/android/java/src/org/chromium/chrome/browser/firstrun/FirstRunFlowSequencer.java
++++ w/chrome/android/java/src/org/chromium/chrome/browser/firstrun/FirstRunFlowSequencer.java
+@@ -30,17 +30,17 @@
+ import org.chromium.chrome.browser.customtabs.AuthTabIntentDataProvider;
+ import org.chromium.chrome.browser.flags.ChromeFeatureList;
+ import org.chromium.chrome.browser.flags.ChromeSwitches;
+-import org.chromium.chrome.browser.locale.LocaleManager;
+ import org.chromium.chrome.browser.partnercustomizations.PartnerBrowserCustomizations;
+ import org.chromium.chrome.browser.profiles.Profile;
+ import org.chromium.chrome.browser.profiles.ProfileProvider;
+-import org.chromium.chrome.browser.search_engines.SearchEnginePromoType;
++import org.chromium.chrome.browser.search_engines.TemplateUrlServiceFactory;
+ import org.chromium.chrome.browser.signin.services.IdentityServicesProvider;
+ import org.chromium.chrome.browser.signin.services.SigninPreferencesManager;
+ import org.chromium.chrome.browser.ui.signin.history_sync.HistorySyncHelper;
+ import org.chromium.components.crash.CrashKeyIndex;
+ import org.chromium.components.crash.CrashKeys;
+ import org.chromium.components.embedder_support.util.UrlConstants;
++import org.chromium.components.search_engines.TemplateUrlService;
+ import org.chromium.components.signin.AccountManagerFacadeProvider;
+ import org.chromium.components.signin.identitymanager.IdentityManager;
+ 
+@@ -95,10 +95,16 @@
+         /** @return true if the Search Engine promo page should be shown. */
+         @VisibleForTesting
+         public boolean shouldShowSearchEnginePage() {
+-            @SearchEnginePromoType
+-            int searchPromoType = LocaleManager.getInstance().getSearchEnginePromoShowType();
+-            return searchPromoType == SearchEnginePromoType.SHOW_NEW
+-                    || searchPromoType == SearchEnginePromoType.SHOW_EXISTING;
++            // Canopy: first run always asks. Skip only when policy owns the engine.
++            ProfileProvider provider = mProfileSupplier.get();
++            if (provider != null) {
++                Profile profile = provider.getOriginalProfile();
++                TemplateUrlService service = TemplateUrlServiceFactory.getForProfile(profile);
++                if (service.isLoaded() && service.isDefaultSearchManaged()) {
++                    return false;
++                }
++            }
++            return true;
+         }
+     }
+ 
+diff --git i/chrome/android/java/src/org/chromium/chrome/browser/firstrun/DefaultSearchEngineFirstRunFragment.java w/chrome/android/java/src/org/chromium/chrome/browser/firstrun/DefaultSearchEngineFirstRunFragment.java
+--- i/chrome/android/java/src/org/chromium/chrome/browser/firstrun/DefaultSearchEngineFirstRunFragment.java
++++ w/chrome/android/java/src/org/chromium/chrome/browser/firstrun/DefaultSearchEngineFirstRunFragment.java
+@@ -16,24 +16,33 @@
+ 
+ import androidx.fragment.app.Fragment;
+ 
+-import org.chromium.base.metrics.RecordUserAction;
+-import org.chromium.base.task.PostTask;
+-import org.chromium.base.task.TaskTraits;
+ import org.chromium.build.annotations.NullMarked;
+ import org.chromium.build.annotations.Nullable;
+ import org.chromium.chrome.R;
+-import org.chromium.chrome.browser.locale.LocaleManager;
+ import org.chromium.chrome.browser.profiles.Profile;
+-import org.chromium.chrome.browser.search_engines.DefaultSearchEngineDialogHelper;
+-import org.chromium.chrome.browser.search_engines.SearchEnginePromoType;
+ import org.chromium.chrome.browser.search_engines.TemplateUrlServiceFactory;
+ import org.chromium.components.browser_ui.widget.RadioButtonLayout;
++import org.chromium.components.search_engines.ChoiceMadeLocation;
++import org.chromium.components.search_engines.TemplateUrl;
++import org.chromium.components.search_engines.TemplateUrlService;
++
++import java.util.ArrayList;
++import java.util.List;
+ 
+ /** A {@link Fragment} that presents a set of search engines for the user to choose from. */
+ @NullMarked
+ public class DefaultSearchEngineFirstRunFragment extends Fragment implements FirstRunFragment {
+-    private @SearchEnginePromoType int mSearchEnginePromoDialogType;
+-    private boolean mShownRecorded;
++    /**
++     * Privacy-first order. Google stays selectable. Keywords match
++     * prepopulated_engines.json at the Chromium 153 pin. Baidu and the other
++     * regional engines stay in the list when Chromium already ships them; they
++     * are not the default.
++     */
++    private static final String[] CANOPY_ENGINE_ORDER = {
++        "duckduckgo.com", "search.brave.com", "ecosia.org", "bing.com", "google.com",
++    };
++
++    private static final String CANOPY_DEFAULT_KEYWORD = "duckduckgo.com";
+ 
+     @Override
+     public View onCreateView(
+@@ -43,12 +52,9 @@
+         View rootView =
+                 inflater.inflate(
+                         R.layout.default_search_engine_first_run_fragment, container, false);
+-        // Layout that displays the available search engines to the user.
+         RadioButtonLayout engineLayout =
+                 rootView.findViewById(R.id.default_search_engine_dialog_options);
+-        // The button that lets a user proceed to the next page after an engine is selected.
+         Button button = rootView.findViewById(R.id.button_primary);
+-        button.setEnabled(false);
+ 
+         ((TextView) rootView.findViewById(R.id.footer))
+                 .setText(R.string.search_engine_dialog_footer);
+@@ -57,21 +63,74 @@
+         FirstRunPageDelegate delegate = assumeNonNull(getPageDelegate());
+         Profile profile =
+                 assumeNonNull(delegate.getProfileProviderSupplier().get()).getOriginalProfile();
++        TemplateUrlService service = TemplateUrlServiceFactory.getForProfile(profile);
++        assert service.isLoaded();
+ 
+-        assert TemplateUrlServiceFactory.getForProfile(profile).isLoaded();
+-        mSearchEnginePromoDialogType = LocaleManager.getInstance().getSearchEnginePromoShowType();
+-        if (mSearchEnginePromoDialogType != SearchEnginePromoType.DONT_SHOW) {
+-            new DefaultSearchEngineDialogHelper(
+-                    mSearchEnginePromoDialogType,
+-                    LocaleManager.getInstance(),
+-                    engineLayout,
+-                    button,
+-                    getPageDelegate()::advanceToNextPage);
++        List<TemplateUrl> engines = canopyChoiceEngines(service.getTemplateUrls());
++        if (engines.isEmpty()) {
++            // Nothing to choose. Do not trap first run.
++            button.setEnabled(true);
++            button.setOnClickListener(view -> assumeNonNull(getPageDelegate()).advanceToNextPage());
++            return rootView;
+         }
+ 
++        List<CharSequence> engineNames = new ArrayList<>();
++        List<String> keywords = new ArrayList<>();
++        int selectedIndex = 0;
++        for (int i = 0; i < engines.size(); i++) {
++            TemplateUrl engine = engines.get(i);
++            engineNames.add(engine.getShortName());
++            keywords.add(engine.getKeyword());
++            if (CANOPY_DEFAULT_KEYWORD.equals(engine.getKeyword())) {
++                selectedIndex = i;
++            }
++        }
++
++        engineLayout.addOptions(engineNames, keywords);
++        engineLayout.selectChildAtIndex(selectedIndex);
++        final String[] selectedKeyword = new String[] {keywords.get(selectedIndex)};
++        engineLayout.setOnCheckedChangeListener(
++                (group, checkedId) -> {
++                    selectedKeyword[0] =
++                            (String) assumeNonNull(group.findViewById(checkedId)).getTag();
++                    button.setEnabled(selectedKeyword[0] != null);
++                });
++        button.setEnabled(true);
++        button.setOnClickListener(
++                view -> {
++                    if (selectedKeyword[0] == null) {
++                        return;
++                    }
++                    // CHOICE_SCREEN is stored, so later launches keep this pick.
++                    service.setSearchEngine(selectedKeyword[0], ChoiceMadeLocation.CHOICE_SCREEN);
++                    assumeNonNull(getPageDelegate()).advanceToNextPage();
++                });
+         return rootView;
+     }
+ 
++    /**
++     * Prepopulated engines only. Preferred keywords lead; everything else keeps its relative order.
++     */
++    private static List<TemplateUrl> canopyChoiceEngines(List<TemplateUrl> all) {
++        List<TemplateUrl> engines = new ArrayList<>();
++        for (TemplateUrl engine : all) {
++            if (engine.getPrepopulatedId() != 0) {
++                engines.add(engine);
++            }
++        }
++        List<TemplateUrl> ordered = new ArrayList<>();
++        for (String keyword : CANOPY_ENGINE_ORDER) {
++            for (int i = 0; i < engines.size(); i++) {
++                if (keyword.equals(engines.get(i).getKeyword())) {
++                    ordered.add(engines.remove(i));
++                    break;
++                }
++            }
++        }
++        ordered.addAll(engines);
++        return ordered;
++    }
++
+     @Override
+     public void setInitialA11yFocus() {
+         // Ignore calls before view is created.
+@@ -80,32 +139,4 @@
+         final View title = getView().findViewById(R.id.chooser_title);
+         title.sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED);
+     }
+-
+-    @Override
+-    public void onResume() {
+-        super.onResume();
+-
+-        if (mSearchEnginePromoDialogType == SearchEnginePromoType.DONT_SHOW) {
+-            PostTask.postTask(
+-                    TaskTraits.UI_DEFAULT,
+-                    () -> {
+-                        FirstRunPageDelegate delegate = assumeNonNull(getPageDelegate());
+-                        delegate.advanceToNextPage();
+-                    });
+-        }
+-
+-        recordShown();
+-    }
+-
+-    private void recordShown() {
+-        if (mShownRecorded) return;
+-
+-        if (mSearchEnginePromoDialogType == SearchEnginePromoType.SHOW_NEW) {
+-            RecordUserAction.record("SearchEnginePromo.NewDevice.Shown.FirstRun");
+-        } else if (mSearchEnginePromoDialogType == SearchEnginePromoType.SHOW_EXISTING) {
+-            RecordUserAction.record("SearchEnginePromo.ExistingDevice.Shown.FirstRun");
+-        }
+-
+-        mShownRecorded = true;
+-    }
+ }

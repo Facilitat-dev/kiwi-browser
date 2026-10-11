@@ -1,0 +1,70 @@
+diff --git i/components/regional_capabilities/regional_capabilities_utils.cc w/components/regional_capabilities/regional_capabilities_utils.cc
+--- i/components/regional_capabilities/regional_capabilities_utils.cc
++++ w/components/regional_capabilities/regional_capabilities_utils.cc
+@@ -67,6 +67,39 @@
+   std::shuffle(engines.begin(), engines.end(), generator);
+ }
+ 
++// Canopy: DuckDuckGo leads every regional list, including countries whose
++// top-N omits it. Google is inserted when a list does not already contain it.
++void EnsureCanopySearchEngines(
++    std::vector<raw_ptr<const PrepopulatedEngine>>& engines) {
++  const PrepopulatedEngine* google_engine = &TemplateURLPrepopulateData::google;
++  const PrepopulatedEngine* duckduckgo =
++      &TemplateURLPrepopulateData::duckduckgo;
++
++  auto find_engine = [&](const PrepopulatedEngine* engine) {
++    return std::find_if(
++        engines.begin(), engines.end(),
++        [engine](const raw_ptr<const PrepopulatedEngine>& candidate) {
++          return candidate.get() == engine;
++        });
++  };
++
++  if (find_engine(google_engine) == engines.end()) {
++    engines.push_back(google_engine);
++  }
++
++  auto duckduckgo_it = find_engine(duckduckgo);
++  if (duckduckgo_it == engines.end()) {
++    engines.insert(engines.begin(), duckduckgo);
++    return;
++  }
++  if (duckduckgo_it == engines.begin()) {
++    return;
++  }
++  raw_ptr<const PrepopulatedEngine> found = *duckduckgo_it;
++  engines.erase(duckduckgo_it);
++  engines.insert(engines.begin(), found);
++}
++
+ }  // namespace
+ 
+ constexpr MigratingEngines ComputeMigratedEnginesMapping(
+@@ -187,6 +220,8 @@
+     }
+   }
+ 
++  EnsureCanopySearchEngines(engines);
++
+   CHECK(!engines.empty()) << "Unexpected PrepopulatedEngines to be empty. "
+                              "SearchEngineListType might be invalid: "
+                           << static_cast<int>(search_engine_list_type);
+diff --git i/components/search_engines/template_url_prepopulate_data.cc w/components/search_engines/template_url_prepopulate_data.cc
+--- i/components/search_engines/template_url_prepopulate_data.cc
++++ w/components/search_engines/template_url_prepopulate_data.cc
+@@ -307,6 +307,14 @@
+     PrefService& prefs,
+     const std::vector<raw_ptr<const PrepopulatedEngine>>&
+         regional_prepopulated_engines) {
++  // Canopy: privacy-first default from the full built-in list, so a regional
++  // top-N that omits DuckDuckGo still falls back to it. Google stays
++  // selectable.
++  if (std::unique_ptr<TemplateURLData> fallback =
++          GetPrepopulatedEngineFromFullList(
++              prefs, regional_prepopulated_engines, duckduckgo.id)) {
++    return fallback;
++  }
+   return FindPrepopulatedEngineInternal(prefs, regional_prepopulated_engines,
+                                         google.id,
+                                         /*use_first_as_fallback=*/true);

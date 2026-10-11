@@ -26,6 +26,10 @@ disable_fieldtrial_testing_config = true
 enable_reporting = false
 enable_hangout_services_extension = false
 enable_mdns = false
+# Defaults to enable_mdns. Set explicitly so discovery cannot come back on.
+enable_service_discovery = false
+# Android default is already false (chrome-branded desktop only).
+enable_rlz = false
 enable_remoting = false
 enable_vr = false
 enable_arcore = false
