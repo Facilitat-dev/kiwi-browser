@@ -12,3 +12,9 @@ m153/0015-toolbar-always-on-no-autohide.patch
 m153/0016-appmenu-omnibox-grow-upward.patch
 m153/0017-appmenu-extensions-row.patch
 m153/0018-extension-action-icons-phone.patch
+m153/0031-disable-component-updater-pings.patch
+m153/0032-disable-variations-client-data.patch
+m153/0033-privacy-pref-defaults.patch
+m153/0034-duckduckgo-default-search.patch
+m153/0035-first-run-search-choice.patch
+m153/0036-safe-browsing-no-url-upload.patch

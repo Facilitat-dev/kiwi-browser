@@ -1,0 +1,110 @@
+diff --git i/chrome/browser/profiles/profile.cc w/chrome/browser/profiles/profile.cc
+--- i/chrome/browser/profiles/profile.cc
++++ w/chrome/browser/profiles/profile.cc
+@@ -336,9 +336,10 @@
+ 
+ // static
+ void Profile::RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
++  // Canopy: do not upload omnibox keystrokes to the default search provider.
+   registry->RegisterBooleanPref(
+       prefs::kSearchSuggestEnabled,
+-      true,
++      false,
+       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+ #if BUILDFLAG(IS_ANDROID)
+   registry->RegisterStringPref(
+diff --git i/components/feed/core/shared_prefs/pref_names.cc w/components/feed/core/shared_prefs/pref_names.cc
+--- i/components/feed/core/shared_prefs/pref_names.cc
++++ w/components/feed/core/shared_prefs/pref_names.cc
+@@ -24,9 +24,10 @@
+ const char kEnableSnippetsByDse[] = "ntp_snippets_by_dse.enable";
+ 
+ void RegisterFeedSharedProfilePrefs(PrefRegistrySimple* registry) {
+-  registry->RegisterBooleanPref(kEnableSnippets, true);
+-  registry->RegisterBooleanPref(kArticlesListVisible, true);
+-  registry->RegisterBooleanPref(kEnableSnippetsByDse, true);
++  // Canopy: Discover / articles stay off. Users can turn the feed back on.
++  registry->RegisterBooleanPref(kEnableSnippets, false);
++  registry->RegisterBooleanPref(kArticlesListVisible, false);
++  registry->RegisterBooleanPref(kEnableSnippetsByDse, false);
+ }
+ 
+ }  // namespace prefs
+diff --git i/components/domain_reliability/domain_reliability_prefs.cc w/components/domain_reliability/domain_reliability_prefs.cc
+--- i/components/domain_reliability/domain_reliability_prefs.cc
++++ w/components/domain_reliability/domain_reliability_prefs.cc
+@@ -15,7 +15,9 @@
+ }  // namespace prefs
+ 
+ void RegisterPrefs(PrefRegistrySimple* registry) {
+-  registry->RegisterBooleanPref(prefs::kDomainReliabilityAllowedByPolicy, true);
++  // Canopy: do not upload domain-reliability beacons.
++  registry->RegisterBooleanPref(prefs::kDomainReliabilityAllowedByPolicy,
++                                false);
+ }
+ 
+ }  // namespace domain_reliability
+diff --git i/components/network_time/network_time_tracker.cc w/components/network_time/network_time_tracker.cc
+--- i/components/network_time/network_time_tracker.cc
++++ w/components/network_time/network_time_tracker.cc
+@@ -182,7 +182,8 @@
+ // static
+ void NetworkTimeTracker::RegisterPrefs(PrefRegistrySimple* registry) {
+   registry->RegisterDictionaryPref(prefs::kNetworkTimeMapping);
+-  registry->RegisterBooleanPref(prefs::kNetworkTimeQueriesEnabled, true);
++  // Canopy: do not query Google for the network time.
++  registry->RegisterBooleanPref(prefs::kNetworkTimeQueriesEnabled, false);
+ }
+ 
+ NetworkTimeTracker::NetworkTimeTracker(
+diff --git i/components/safe_browsing/core/common/safe_browsing_prefs.cc w/components/safe_browsing/core/common/safe_browsing_prefs.cc
+--- i/components/safe_browsing/core/common/safe_browsing_prefs.cc
++++ w/components/safe_browsing/core/common/safe_browsing_prefs.cc
+@@ -269,14 +269,17 @@
+                                 false);
+   registry->RegisterBooleanPref(
+       prefs::kSafeBrowsingSawInterstitialScoutReporting, false);
++  // Canopy: extended reporting stays unavailable. It would send URLs.
+   registry->RegisterBooleanPref(
+-      prefs::kSafeBrowsingExtendedReportingOptInAllowed, true);
++      prefs::kSafeBrowsingExtendedReportingOptInAllowed, false);
+   registry->RegisterTimePref(
+       prefs::kSafeBrowsingEsbProtegoPingWithTokenLastLogTime, base::Time());
+   registry->RegisterTimePref(
+       prefs::kSafeBrowsingEsbProtegoPingWithoutTokenLastLogTime, base::Time());
++  // Canopy: No protection. Settings still offers Standard and Enhanced.
++  // URL lookups are also stubbed so enabling them cannot upload the page URL.
+   registry->RegisterBooleanPref(
+-      prefs::kSafeBrowsingEnabled, true,
++      prefs::kSafeBrowsingEnabled, false,
+       user_prefs::PrefRegistrySyncable::SYNCABLE_PREF);
+   if (base::FeatureList::IsEnabled(kEsbAsASyncedSetting)) {
+     registry->RegisterBooleanPref(
+diff --git i/chrome/android/java/src/org/chromium/chrome/browser/firstrun/FirstRunActivityBase.java w/chrome/android/java/src/org/chromium/chrome/browser/firstrun/FirstRunActivityBase.java
+--- i/chrome/android/java/src/org/chromium/chrome/browser/firstrun/FirstRunActivityBase.java
++++ w/chrome/android/java/src/org/chromium/chrome/browser/firstrun/FirstRunActivityBase.java
+@@ -59,7 +59,9 @@
+     static final String SHOW_SEARCH_ENGINE_PAGE = "ShowSearchEnginePage";
+     static final String SHOW_HISTORY_SYNC_PAGE = "ShowHistorySync";
+ 
+-    public static final boolean DEFAULT_METRICS_AND_CRASH_REPORTING = true;
++    // Canopy: opt-in. Must match FullscreenSigninMediator, which writes the
++    // metrics consent bit. This constant feeds the FRE histogram.
++    public static final boolean DEFAULT_METRICS_AND_CRASH_REPORTING = false;
+ 
+     private boolean mNativeInitialized;
+     private @Nullable AppHeaderStateProvider mAppHeaderStateProvider;
+diff --git i/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/fullscreen_signin/FullscreenSigninMediator.java w/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/fullscreen_signin/FullscreenSigninMediator.java
+--- i/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/fullscreen_signin/FullscreenSigninMediator.java
++++ w/chrome/browser/ui/android/signin/java/src/org/chromium/chrome/browser/ui/signin/fullscreen_signin/FullscreenSigninMediator.java
+@@ -324,7 +324,9 @@
+                             ? mForcedSigninStatusProvider.showForcedSigninScreen()
+                             : TokenHolder.INVALID_TOKEN;
+         } else {
+-            mAllowMetricsAndCrashUploading = true;
++            // Canopy: metrics and crash upload start off. The UMA dialog can
++            // still turn them on. Enterprise policy above is unchanged.
++            mAllowMetricsAndCrashUploading = false;
+             mIsSigninForcedByPolicy = false;
+         }
+ 

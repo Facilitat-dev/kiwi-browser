@@ -22,7 +22,7 @@ Signing: `./scripts/make-keystore.sh` writes `~/.config/facilitat-browser/dev.ke
 
 uBlock zip: `./ci/fetch_ublock_chromium.sh` (pinned 1.62.0, gitignored under `third_party/extensions/ublock/`).
 
-## What the five patches do
+## What the patches do
 
 | Patch | Why |
 |---|---|
@@ -38,6 +38,12 @@ uBlock zip: `./ci/fetch_ublock_chromium.sh` (pinned 1.62.0, gitignored under `th
 | `0016-appmenu-omnibox-grow-upward` | Bottom-bar menu opens upward; suggestions already fill the space above |
 | `0017-appmenu-extensions-row` | Overflow Extensions row stays available for chrome://extensions |
 | `0018-extension-action-icons-phone` | Phone toolbar hosts clickable extension action icons |
+| `0031-disable-component-updater-pings` | Component updater does not ping Google; update checks stay |
+| `0032-disable-variations-client-data` | No `X-Client-Data` on any request |
+| `0033-privacy-pref-defaults` | Suggest, feed, domain reliability, network time, and metrics start off |
+| `0034-duckduckgo-default-search` | DuckDuckGo is the fallback; Google stays in the list |
+| `0035-first-run-search-choice` | First run asks for a search engine and remembers the pick |
+| `0036-safe-browsing-no-url-upload` | Safe Browsing defaults off and never sends the page URL |
 
 ## Package ID
 

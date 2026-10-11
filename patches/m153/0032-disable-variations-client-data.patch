@@ -1,0 +1,25 @@
+diff --git i/components/variations/net/variations_http_headers.cc w/components/variations/net/variations_http_headers.cc
+--- i/components/variations/net/variations_http_headers.cc
++++ w/components/variations/net/variations_http_headers.cc
+@@ -124,16 +124,11 @@
+ // rather than `headers`, to be exempted from CORS checks, and to avoid exposing
+ // the header to service workers.
+ bool ShouldAppendVariationsHeader(const GURL& url, InIncognito incognito) {
+-  // Note the criteria for attaching client experiment headers:
+-  // 1. We only transmit to Google owned domains which can evaluate
+-  // experiments.
+-  //    1a. These include hosts which have a standard postfix such as:
+-  //         *.doubleclick.net or *.googlesyndication.com or
+-  //         exactly www.googleadservices.com or
+-  //         international TLD domains *.google.<TLD> or *.youtube.<TLD>.
+-  // 2. Only transmit for non-Incognito profiles.
+-  return incognito == InIncognito::kNo &&
+-         GetUrlValidationResult(url) == URLValidationResult::kShouldAppend;
++  // Canopy: never attach X-Client-Data. Finch seed fetch is already skipped
++  // because this build is not GOOGLE_CHROME_BRANDING.
++  (void)url;
++  (void)incognito;
++  return false;
+ }
+ 
+ // Returns non-empty `std::string` if `variations_headers` has a header value
