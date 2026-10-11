@@ -114,6 +114,8 @@ None of slices 1–7 are implemented yet (0003 only covers null-coordinator fall
 
 **Accept:** cold open has no promo/IPH/Edge/kiwi chrome; Canopy-only strings.
 
+**Landed:** `0028` removes the settings promo card and the Google services row (sign-in stays) and drops both from search. `0029` no-ops What's new `showBottomSheet`, home-tip registration, and the bottom-omnibox IPH. The phone toolbar is already bottom from `0014`–`0016`. `0030` does not add Relixor `PersonalizeResults` (that file is not in 153). It refuses `*.kiwibrowser.com`, `find.kiwi`, `*.kiwibrowser.org`, and kiwisearchservices hosts in history and in the popular-sites fetch (the stock URL stays gstatic), and it does not desktop-mode those hosts or `microsoftedge.microsoft.com` / `edge.microsoft.com`. Chrome Web Store desktop UA from `0005` is unchanged. Appended after `0018`. `0019`–`0027` are not on this branch; the series will be rebased so they land before `0028`. Do not renumber these patches. `is_desktop_android` stays true.
+
 ---
 
 ## Done when (UI-PORT)

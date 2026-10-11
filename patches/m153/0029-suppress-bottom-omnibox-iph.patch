@@ -1,0 +1,206 @@
+diff --git i/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarIphController.java w/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarIphController.java
+index 197aa32..42a4c41 100644
+--- i/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarIphController.java
++++ w/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarIphController.java
+@@ -5,7 +5,6 @@
+ package org.chromium.chrome.browser.toolbar;
+ 
+ import android.content.Context;
+-import android.graphics.Rect;
+ import android.view.View;
+ 
+ import androidx.annotation.VisibleForTesting;
+@@ -22,8 +21,6 @@ import org.chromium.components.feature_engagement.FeatureConstants;
+ @NullMarked
+ public class ToolbarIphController {
+ 
+-    // 2 seconds.
+-    private static final long MIN_DELAY_BEFORE_TOUCH_DISMISS_MS = 2000;
+     // 5 seconds.
+     @VisibleForTesting static final int GLIC_IPH_AUTO_DISMISS_TIMEOUT_MS = 5 * 1000;
+ 
+@@ -43,17 +40,8 @@ public class ToolbarIphController {
+ 
+     @VisibleForTesting
+     public void showBottomToolbarIph(View anchorView) {
+-        int yInset = mContext.getResources().getDimensionPixelOffset(R.dimen.toolbar_iph_y_inset);
+-        mEducationHelper.requestShowIph(
+-                new IphCommandBuilder(
+-                                mContext.getResources(),
+-                                FeatureConstants.BOTTOM_TOOLBAR_FEATURE,
+-                                R.string.toolbar_long_press_options_iph,
+-                                R.string.toolbar_long_press_options_iph)
+-                        .setInsetRect(new Rect(0, 0, 0, yInset))
+-                        .setAnchorView(anchorView)
+-                        .setDelayedDismissOnTouch(MIN_DELAY_BEFORE_TOUCH_DISMISS_MS)
+-                        .build());
++        // Canopy: patches 0014-0016 already put the phone toolbar at the bottom.
++        // Do not show the long-press / bottom-omnibox tip.
+     }
+ 
+     /**
+diff --git i/chrome/android/junit/src/org/chromium/chrome/browser/toolbar/ToolbarIphControllerUnitTest.java w/chrome/android/junit/src/org/chromium/chrome/browser/toolbar/ToolbarIphControllerUnitTest.java
+index 052a412..8cb5238 100644
+--- i/chrome/android/junit/src/org/chromium/chrome/browser/toolbar/ToolbarIphControllerUnitTest.java
++++ w/chrome/android/junit/src/org/chromium/chrome/browser/toolbar/ToolbarIphControllerUnitTest.java
+@@ -7,6 +7,8 @@ package org.chromium.chrome.browser.toolbar;
+ import static org.junit.Assert.assertEquals;
+ import static org.junit.Assert.assertNotNull;
+ import static org.junit.Assert.assertTrue;
++import static org.mockito.ArgumentMatchers.any;
++import static org.mockito.Mockito.never;
+ import static org.mockito.Mockito.verify;
+ 
+ import static org.chromium.chrome.browser.toolbar.ToolbarIphController.GLIC_IPH_AUTO_DISMISS_TIMEOUT_MS;
+@@ -71,10 +73,6 @@ public class ToolbarIphControllerUnitTest {
+     public void testShowBottomToolbarIph() {
+         mController.showBottomToolbarIph(mAnchorView);
+ 
+-        verify(mUserEducationHelper).requestShowIph(mIphCommandCaptor.capture());
+-        IphCommand cmd = mIphCommandCaptor.getValue();
+-        assertNotNull(cmd);
+-        assertEquals(FeatureConstants.BOTTOM_TOOLBAR_FEATURE, cmd.featureName);
+-        assertEquals(mAnchorView, cmd.anchorView);
++        verify(mUserEducationHelper, never()).requestShowIph(any());
+     }
+ }
+diff --git i/chrome/browser/educational_tip/java/src/org/chromium/chrome/browser/educational_tip/HomeTipsModulesProvider.java w/chrome/browser/educational_tip/java/src/org/chromium/chrome/browser/educational_tip/HomeTipsModulesProvider.java
+index 725b034..2ca1890 100644
+--- i/chrome/browser/educational_tip/java/src/org/chromium/chrome/browser/educational_tip/HomeTipsModulesProvider.java
++++ w/chrome/browser/educational_tip/java/src/org/chromium/chrome/browser/educational_tip/HomeTipsModulesProvider.java
+@@ -7,8 +7,6 @@ package org.chromium.chrome.browser.educational_tip;
+ import androidx.annotation.VisibleForTesting;
+ 
+ import org.chromium.build.annotations.NullMarked;
+-import org.chromium.chrome.browser.educational_tip.two_cell.EducationalTipModuleTwoCellBuilder;
+-import org.chromium.chrome.browser.magic_stack.ModuleDelegate.ModuleType;
+ import org.chromium.chrome.browser.magic_stack.ModuleRegistry;
+ import org.chromium.chrome.browser.setup_list.SetupListModuleUtils;
+ 
+@@ -36,21 +34,7 @@ public class HomeTipsModulesProvider {
+      */
+     public static void registerTipModules(
+             EducationTipModuleActionDelegate actionDelegate, ModuleRegistry moduleRegistry) {
+-        boolean isSetupListActive = SetupListModuleUtils.isSetupListActive();
+-        boolean showTwoCell = SetupListModuleUtils.shouldShowTwoCellLayout();
+-
+-        Collection<Integer> modulesToRegister =
+-                getModuleTypesToRegister(isSetupListActive, showTwoCell);
+-        for (@ModuleType int moduleType : modulesToRegister) {
+-            if (moduleType == ModuleType.SETUP_LIST_TWO_CELL_CONTAINER) {
+-                moduleRegistry.registerModule(
+-                        moduleType,
+-                        new EducationalTipModuleTwoCellBuilder(moduleType, actionDelegate));
+-            } else {
+-                moduleRegistry.registerModule(
+-                        moduleType, new EducationalTipModuleBuilder(moduleType, actionDelegate));
+-            }
+-        }
++        // Canopy: no educational tips, setup-list cards, or other home tips.
+     }
+ 
+     /**
+diff --git i/chrome/browser/educational_tip/junit/src/org/chromium/chrome/browser/educational_tip/HomeTipsModulesProviderUnitTest.java w/chrome/browser/educational_tip/junit/src/org/chromium/chrome/browser/educational_tip/HomeTipsModulesProviderUnitTest.java
+index 5bde55c..5b83ce4 100644
+--- i/chrome/browser/educational_tip/junit/src/org/chromium/chrome/browser/educational_tip/HomeTipsModulesProviderUnitTest.java
++++ w/chrome/browser/educational_tip/junit/src/org/chromium/chrome/browser/educational_tip/HomeTipsModulesProviderUnitTest.java
+@@ -7,7 +7,8 @@ package org.chromium.chrome.browser.educational_tip;
+ import static org.junit.Assert.assertArrayEquals;
+ import static org.junit.Assert.assertTrue;
+ import static org.mockito.ArgumentMatchers.any;
+-import static org.mockito.ArgumentMatchers.eq;
++import static org.mockito.ArgumentMatchers.anyInt;
++import static org.mockito.Mockito.never;
+ import static org.mockito.Mockito.verify;
+ import static org.mockito.Mockito.when;
+ 
+@@ -24,12 +25,10 @@ import org.robolectric.annotation.Config;
+ 
+ import org.chromium.base.supplier.ObservableSuppliers;
+ import org.chromium.base.test.BaseRobolectricTestRunner;
+-import org.chromium.chrome.browser.educational_tip.two_cell.EducationalTipModuleTwoCellBuilder;
+ import org.chromium.chrome.browser.magic_stack.ModuleDelegate.ModuleType;
+ import org.chromium.chrome.browser.magic_stack.ModuleRegistry;
+ import org.chromium.chrome.browser.profiles.Profile;
+ import org.chromium.chrome.browser.setup_list.SetupListManager;
+-import org.chromium.chrome.browser.setup_list.SetupListModuleUtils;
+ 
+ import java.util.Collection;
+ import java.util.List;
+@@ -68,10 +67,7 @@ public class HomeTipsModulesProviderUnitTest {
+ 
+         HomeTipsModulesProvider.registerTipModules(mActionDelegate, mModuleRegistry);
+ 
+-        verify(mModuleRegistry)
+-                .registerModule(
+-                        eq(SetupListModuleUtils.getTwoCellContainerModuleTypes().get(0)),
+-                        any(EducationalTipModuleTwoCellBuilder.class));
++        verify(mModuleRegistry, never()).registerModule(anyInt(), any());
+     }
+ 
+     @Test
+@@ -82,11 +78,7 @@ public class HomeTipsModulesProviderUnitTest {
+ 
+         HomeTipsModulesProvider.registerTipModules(mActionDelegate, mModuleRegistry);
+ 
+-        List<Integer> setupListModules = SetupListManager.BASE_SETUP_LIST_ORDER;
+-        for (@ModuleType int moduleType : setupListModules) {
+-            verify(mModuleRegistry)
+-                    .registerModule(eq(moduleType), any(EducationalTipModuleBuilder.class));
+-        }
++        verify(mModuleRegistry, never()).registerModule(anyInt(), any());
+     }
+ 
+     @Test
+@@ -96,11 +88,7 @@ public class HomeTipsModulesProviderUnitTest {
+ 
+         HomeTipsModulesProvider.registerTipModules(mActionDelegate, mModuleRegistry);
+ 
+-        Collection<Integer> educationalTipModules = EducationalTipModuleUtils.getModuleTypes();
+-        for (@ModuleType int moduleType : educationalTipModules) {
+-            verify(mModuleRegistry)
+-                    .registerModule(eq(moduleType), any(EducationalTipModuleBuilder.class));
+-        }
++        verify(mModuleRegistry, never()).registerModule(anyInt(), any());
+     }
+ 
+     @Test
+diff --git i/chrome/browser/ui/android/whats_new/java/src/org/chromium/chrome/browser/ui/android/whats_new/WhatsNewCoordinator.java w/chrome/browser/ui/android/whats_new/java/src/org/chromium/chrome/browser/ui/android/whats_new/WhatsNewCoordinator.java
+index 30ca783..9de71b7 100644
+--- i/chrome/browser/ui/android/whats_new/java/src/org/chromium/chrome/browser/ui/android/whats_new/WhatsNewCoordinator.java
++++ w/chrome/browser/ui/android/whats_new/java/src/org/chromium/chrome/browser/ui/android/whats_new/WhatsNewCoordinator.java
+@@ -68,8 +68,9 @@ public class WhatsNewCoordinator {
+ 
+     /* Request to show the What's New bottom sheet.  */
+     public void showBottomSheet() {
++        // Canopy: no What's new sheet. The phone toolbar is already bottom.
+         if (isEnabled()) {
+-            mMediator.showBottomSheet();
++            return;
+         }
+     }
+ 
+diff --git i/chrome/browser/ui/android/whats_new/java/src/org/chromium/chrome/browser/ui/android/whats_new/WhatsNewCoordinatorTest.java w/chrome/browser/ui/android/whats_new/java/src/org/chromium/chrome/browser/ui/android/whats_new/WhatsNewCoordinatorTest.java
+index e62c414..65574f8 100644
+--- i/chrome/browser/ui/android/whats_new/java/src/org/chromium/chrome/browser/ui/android/whats_new/WhatsNewCoordinatorTest.java
++++ w/chrome/browser/ui/android/whats_new/java/src/org/chromium/chrome/browser/ui/android/whats_new/WhatsNewCoordinatorTest.java
+@@ -7,6 +7,7 @@ package org.chromium.chrome.browser.ui.android.whats_new;
+ import static org.junit.Assert.assertEquals;
+ import static org.mockito.ArgumentMatchers.any;
+ import static org.mockito.ArgumentMatchers.eq;
++import static org.mockito.Mockito.never;
+ import static org.mockito.Mockito.verify;
+ 
+ import android.content.Context;
+@@ -78,10 +79,7 @@ public class WhatsNewCoordinatorTest {
+ 
+         coordinator.showBottomSheet();
+ 
+-        assertEquals(
+-                ViewState.OVERVIEW,
+-                coordinator.getModelForTesting().get(WhatsNewProperties.VIEW_STATE));
+-        verify(mBottomSheetControllerMock).requestShowContent(any(), eq(true));
++        verify(mBottomSheetControllerMock, never()).requestShowContent(any(), eq(true));
+     }
+ 
+     @Test
