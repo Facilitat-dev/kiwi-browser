@@ -12,3 +12,8 @@ m153/0015-toolbar-always-on-no-autohide.patch
 m153/0016-appmenu-omnibox-grow-upward.patch
 m153/0017-appmenu-extensions-row.patch
 m153/0018-extension-action-icons-phone.patch
+# Slice 7 is appended here. 0019-0027 (slices 3, 5, 6) are not on this
+# branch; rebase will insert them before 0028. Do not renumber 0028-0030.
+m153/0028-hide-google-promo-rows.patch
+m153/0029-suppress-bottom-omnibox-iph.patch
+m153/0030-strip-edge-migration-and-kiwi-endpoints.patch
